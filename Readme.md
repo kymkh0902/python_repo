@@ -17,5 +17,5 @@
 
 - **아래 그림 참조하시기 바랍니다.**
 
-<a href="url"><img src="https://www.google.co.kr/url?sa=i&rct=j&q=&esrc=s&source=images&cd=&cad=rja&uact=8&ved=0ahUKEwjT39PPw9fTAhXEjpQKHXSbB_AQjRwIBw&url=https%3A%2F%2Fplot.ly%2Fr%2Fgithub-getting-started-for-data-scientists%2F&psig=AFQjCNGRhmUgI3m1PKspaqHNqjlhv3nTZg&ust=1494031608364802" align="center" height="300" width="550" ></a>
+<a href="url"><img src="https://s3-us-west-1.amazonaws.com/plotly-tutorials/plotly-documentation/images/git/signup/signup2.png" height="300" width="550" ></a>
 
