@@ -16,6 +16,6 @@
    (https://github-windows.s3.amazonaws.com/GitHubSetup.exe)
 
 - **아래 그림 참조하시기 바랍니다.**
-<a href="url"><img src="http://cfile4.uf.tistory.com/image/264A3A45589AC1EF096294" align="center" height="300" width="550" ></a>
 
- ![sign in](github_sign_in.png "Sign in")
+<a href="url"><img src="https://www.google.co.kr/url?sa=i&rct=j&q=&esrc=s&source=images&cd=&cad=rja&uact=8&ved=0ahUKEwjT39PPw9fTAhXEjpQKHXSbB_AQjRwIBw&url=https%3A%2F%2Fplot.ly%2Fr%2Fgithub-getting-started-for-data-scientists%2F&psig=AFQjCNGRhmUgI3m1PKspaqHNqjlhv3nTZg&ust=1494031608364802" align="center" height="300" width="550" ></a>
+
