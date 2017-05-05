@@ -16,4 +16,4 @@
    (https://github-windows.s3.amazonaws.com/GitHubSetup.exe)
 
 - **아래 그림 참조하시기 바랍니다.**
-<a href="url"><img src="https://github.com/kymkh0902/optical_python/tree/master/pictures/github_sign_in.png" align="center" height="300" width="550"></a>
+<a href="url"><img src="https://github.com/kymkh0902/optical_python/pictures/github_sign_in.png" align="center" height="300" width="550"></a>
