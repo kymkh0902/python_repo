@@ -17,4 +17,4 @@
 
 - **아래 그림 참조하시기 바랍니다.**
 <a href="url"><img src="http://cfile4.uf.tistory.com/image/264A3A45589AC1EF096294" align="center" height="300" width="550" ></a>
-![sign in](pictures/github_sign_in.png?raw=true "Sign in")
+![sign in](github_sign_in.png "Sign in")
