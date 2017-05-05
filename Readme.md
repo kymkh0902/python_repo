@@ -14,6 +14,11 @@
 s = "Hello World"
 print s
 ```
+![Jupyter](https://data36.com/wp-content/uploads/2017/01/data-coding-jupyter-notebook-hello-world-768x162.png)
+![Spyder](https://web.ics.purdue.edu/~yrosokha/img/capture_spyder.jpeg)
+
+- 출력이 잘 된다면 설치가 완료된 것입니다.
+
 
 
 # 2. GitHub 
