@@ -8,14 +8,12 @@
 - 설치 시에 아래 그림에 맞게 모두 클릭해주면 됩니다.         
 <a href="url"><img src="http://cfile4.uf.tistory.com/image/264A3A45589AC1EF096294" align="center" height="300" width="550" ></a> <a href="url"><img src="http://cfile5.uf.tistory.com/image/2559F445589AC1F036C02D" align="center" height="300" width="550" ></a> 
 
-- 설치 완료 후에 윈도우 검색 창에 ***Jupyter***, ***Spyder***를 실행한 후에 아래 내용을 입/출력해봅니다. 
-
-'''python
-
-a = 'HelloWorld'
-
-print(a)
-'''
+- 설치 완료 후에 윈도우 검색 창에서 ***Jupyter, Spyder*** 실행한 후에 아래 내용을 입/출력해봅니다. 
+	
+```python
+s = "Hello World"
+print s
+```
 
 
 # 2. GitHub 
