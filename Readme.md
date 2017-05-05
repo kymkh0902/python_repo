@@ -14,12 +14,14 @@
 s = "Hello World"
 print s
 ```
- - Jupyter 예제
-![Jupyter](https://data36.com/wp-content/uploads/2017/01/data-coding-jupyter-notebook-hello-world-768x162.png)
- - Spyder 예제
-![Spyder](https://web.ics.purdue.edu/~yrosokha/img/capture_spyder.jpeg)
+ - Jupyter 예제(입력 후 Shift + Enter)
+![Jupyter](/pictures/Jupyter.PNG)
+![Jupyter2](/pictures/Jupyter2.PNG)
+ - Spyder 예제(오른쪽 창에 입력 후 Enter)
+![Spyder](pictures/Spyder.PNG)
 
-- 출력이 잘 된다면 설치가 완료된 것입니다.수업 진행 시 Jupyter를 사용할 것이고 이 후에 각자 쓰실 땐 Spyder가 편리하실 거빈다.
+
+- 출력이 잘 된다면 설치가 완료된 것입니다.수업 진행 시 Jupyter를 사용할 것이고 이 후에 각자 쓰실 땐 Spyder가 편리하실 겁니다.
 
 
 
@@ -35,8 +37,13 @@ print s
 
 - 이제 Github에 계정을 만들어 봅시다.(https://github.com) 홈페이지에 접속해서 회원가입을 합니다.  
 
-<a href="url"><img src="https://s3-us-west-1.amazonaws.com/plotly-tutorials/plotly-documentation/images/git/signup/signup2.png" height="300" width="550" ></a>
 ![image](/pictures/github_sign_in.PNG)
 
-- 수업 홈페이지에 접속해서 각자 컴퓨터에 Clone(파일을 내 컴퓨터에 복사하는 과정)합니다.(https://github.com/kymkh0902/optical_python/)
+- 수업 홈페이지에 접속해서 각자 컴퓨터에 Clone(파일을 내 컴퓨터에 복사하는 과정)합니다.
+(https://github.com/kymkh0902/optical_python/)
+
+- 아래와 같이 Clone - Open in Desktop 누르시면 경로가 뜰 건데 Documents/GitHub 에 저장해주세요.  
+![Clone](pictures/github_clone.PNG)
+
+
 
