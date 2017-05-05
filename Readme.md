@@ -14,10 +14,12 @@
 s = "Hello World"
 print s
 ```
+ - Jupyter 예제
 ![Jupyter](https://data36.com/wp-content/uploads/2017/01/data-coding-jupyter-notebook-hello-world-768x162.png)
+ - Spyder 예제
 ![Spyder](https://web.ics.purdue.edu/~yrosokha/img/capture_spyder.jpeg)
 
-- 출력이 잘 된다면 설치가 완료된 것입니다.
+- 출력이 잘 된다면 설치가 완료된 것입니다.수업 진행 시 Jupyter를 사용할 것이고 이 후에 각자 쓰실 땐 Spyder가 편리하실 거빈다.
 
 
 
