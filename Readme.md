@@ -36,4 +36,7 @@ print s
 - 이제 Github에 계정을 만들어 봅시다.(https://github.com) 홈페이지에 접속해서 회원가입을 합니다.  
 
 <a href="url"><img src="https://s3-us-west-1.amazonaws.com/plotly-tutorials/plotly-documentation/images/git/signup/signup2.png" height="300" width="550" ></a>
+![image](/pictures/github_sign_in.PNG)
+
+- 수업 홈페이지에 접속해서 각자 컴퓨터에 Clone(파일을 내 컴퓨터에 복사하는 과정)합니다.(https://github.com/kymkh0902/optical_python/)
 
