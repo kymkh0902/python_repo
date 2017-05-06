@@ -2,22 +2,27 @@
 
 # 1. Python
 
-### - Anaconda 다운로드 및 설치 진행. 
+### - Anaconda 다운로드 및 설치 진행
   (https://repo.continuum.io/archive/Anaconda3-4.3.1-Windows-x86.exe)
 
 - 설치 시에 아래 그림에 맞게 모두 클릭해주면 됩니다.         
 <a href="url"><img src="http://cfile4.uf.tistory.com/image/264A3A45589AC1EF096294" align="center" height="300" width="550" ></a> <a href="url"><img src="http://cfile5.uf.tistory.com/image/2559F445589AC1F036C02D" align="center" height="300" width="550" ></a> 
 
+### - 실행 확인
 - 설치 완료 후에 윈도우 검색 창에서 ***Jupyter, Spyder*** 실행한 후에 아래 내용을 입/출력해봅니다. 
 	
 ```python
 s = "Hello World"
 print s
 ```
- - Jupyter 예제(입력 후 Shift + Enter)
+ 1) Jupyter 예제(입력 후 Shift + Enter)
+
 ![Jupyter](/pictures/Jupyter.PNG)
+
 ![Jupyter2](/pictures/Jupyter_2.PNG)
- - Spyder 예제(오른쪽 창에 입력 후 Enter)
+
+ 2) Spyder 예제(오른쪽 창에 입력 후 Enter)
+
 ![Spyder](pictures/Spyder.PNG)
 
 
@@ -43,6 +48,8 @@ print s
 (https://github.com/kymkh0902/optical_python/)
 
 - 아래와 같이 Clone - Open in Desktop 누르시면 GitHub가 켜지면서 저장 경로가 뜰 건데 Documents/GitHub 에 저장해주세요.  
+
 ![Clone](pictures/github_clone.PNG)
+
 ![Clone2](pictures/github_desktop.PNG)
 
