@@ -5,6 +5,8 @@
 ### - Anaconda 다운로드 및 설치 진행
   (https://repo.continuum.io/archive/Anaconda3-4.3.1-Windows-x86.exe)
 
+- 설치 경로 : **Cloud PC 내** C:\anaconda 경로에 설치
+
 - 설치 시에 아래 그림에 맞게 모두 클릭해주면 됩니다.         
 <a href="url"><img src="http://cfile4.uf.tistory.com/image/264A3A45589AC1EF096294" align="center" height="300" width="550" ></a> <a href="url"><img src="http://cfile5.uf.tistory.com/image/2559F445589AC1F036C02D" align="center" height="300" width="550" ></a> 
 
@@ -26,7 +28,7 @@ print s
 ![Spyder](pictures/Spyder.PNG)
 
 
-- 출력이 잘 된다면 설치가 완료된 것입니다.수업 진행 시 Jupyter를 사용할 것이고 이 후에 각자 쓰실 땐 Spyder가 편리하실 겁니다.
+- 출력이 잘 된다면 설치가 완료된 것입니다. 수업 진행 시 Jupyter를 사용할 것이고 이 후에 각자 쓰실 땐 Spyder가 편리하실 겁니다.
 
 
 
@@ -47,9 +49,19 @@ print s
 - 수업 홈페이지에 접속해서 각자 컴퓨터에 Clone(파일을 내 컴퓨터에 복사하는 과정)합니다.
 (https://github.com/kymkh0902/optical_python/)
 
-- 아래와 같이 Clone - Open in Desktop 누르시면 GitHub가 켜지면서 저장 경로가 뜰 건데 Documents/GitHub 에 저장해주세요.  
+- 아래와 같이 Clone - Open in Desktop 누르시면 GitHub가 켜지면서 저장 경로가 뜰 겁니다. 경로는 Secure Folder\Github에 저장해주세요. 
 
 ![Clone](pictures/github_clone.PNG)
 
 ![Clone2](pictures/github_desktop.PNG)
 
+
+# 3. 강의 순서
+
+1) Python 기본 문법 학습
+
+2) 데이터 분석을 위한 Library 학습(pandas)
+
+3) 머신러닝 간략 소개 
+
+※ 각 강의 별 학습 자료 및 방법 소개. 
