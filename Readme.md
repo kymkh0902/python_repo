@@ -42,8 +42,7 @@ print s
 - 수업 홈페이지에 접속해서 각자 컴퓨터에 Clone(파일을 내 컴퓨터에 복사하는 과정)합니다.
 (https://github.com/kymkh0902/optical_python/)
 
-- 아래와 같이 Clone - Open in Desktop 누르시면 경로가 뜰 건데 Documents/GitHub 에 저장해주세요.  
+- 아래와 같이 Clone - Open in Desktop 누르시면 GitHub가 켜지면서 저장 경로가 뜰 건데 Documents/GitHub 에 저장해주세요.  
 ![Clone](pictures/github_clone.PNG)
-
-
+![Clone2](pictures/github_desktop.PNG)
 
