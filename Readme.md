@@ -16,7 +16,7 @@ print s
 ```
  - Jupyter 예제(입력 후 Shift + Enter)
 ![Jupyter](/pictures/Jupyter.PNG)
-![Jupyter2](/pictures/Jupyter2.PNG)
+![Jupyter2](/pictures/Jupyter_2.PNG)
  - Spyder 예제(오른쪽 창에 입력 후 Enter)
 ![Spyder](pictures/Spyder.PNG)
 
