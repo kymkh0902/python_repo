@@ -28,7 +28,7 @@ print s
 ![Spyder](pictures/Spyder.PNG)
 
 
-- 출력이 잘 된다면 설치가 완료된 것입니다. 수업 진행 시 Jupyter를 사용할 것이고 이 후에 각자 쓰실 땐 Spyder가 편리하실 겁니다.
+- 출력이 잘 된다면 설치가 완료된 것입니다. 수업 진행 시 Jupyter를 사용할 것이고 이 후에 각자 사용하실 땐 Spyder가 편리하실 겁니다.
 
 
 
@@ -54,6 +54,8 @@ print s
 ![Clone](pictures/github_clone.PNG)
 
 ![Clone2](pictures/github_desktop.PNG)
+
+
 
 
 # 3. 강의 순서
