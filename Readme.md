@@ -1,4 +1,4 @@
-# Python/GitHub 설치 과정
+# Python/GitHub 설치 및 강의 계획
 
 # 1. Python
 
