@@ -63,7 +63,9 @@ print s
 1) 기본 설치 확인 및 Git 사용법 학습
 	- 학습 및 활용 방안 Guide 제시 
 
-2) Python 기본 문법 학습
+2) Python 기본 문법 학습 
+  	- Learn python the hard way라는 교재 내용을 바탕으로 진행할 예정입니다. 추가 학습 필요 시 아래 링크 참조.
+          (https://learnpythonthehardway.org/book/)
 
 3) 데이터 분석을 위한 Library 학습(pandas)
 
