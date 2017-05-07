@@ -11,7 +11,7 @@
 <a href="url"><img src="http://cfile4.uf.tistory.com/image/264A3A45589AC1EF096294" align="center" height="300" width="550" ></a> <a href="url"><img src="http://cfile5.uf.tistory.com/image/2559F445589AC1F036C02D" align="center" height="300" width="550" ></a> 
 
 ### - 실행 확인
-- 설치 완료 후에 윈도우 검색 창에서 ***Jupyter, Spyder*** 실행한 후에 아래 내용을 입/출력해봅니다. 
+- 설치 완료 후에 윈도우 검색 창에서 ***Jupyter Notebook, Spyder*** 실행한 후에 아래 내용을 입/출력해봅니다. 
 	
 ```python
 s = "Hello World"
