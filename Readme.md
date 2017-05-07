@@ -15,7 +15,7 @@
 	
 ```python
 s = "Hello World"
-print s
+print(s)
 ```
  1) Jupyter 예제(입력 후 Shift + Enter)
 
