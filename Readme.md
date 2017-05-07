@@ -64,11 +64,11 @@ print s
 	- 학습 및 활용 방안 Guide 제시 
 
 2) Python 기본 문법 학습 
-  	- Learn python the hard way라는 교재 내용을 바탕으로 진행할 예정입니다. 추가 학습 필요 시 아래 링크 참조.
+  	- Learn python the hard way라는 교재 내용을 바탕으로 진행할 예정입니다. 추가 학습 필요 시 아래 링크 참조
           (https://learnpythonthehardway.org/book/)
 
 3) 데이터 분석을 위한 Library 학습(pandas)
 
 4) 머신러닝 간략 소개 
 
-※ 각 강의 별 학습 자료 및 방법 소개. 
+- 각 강의 별 학습 자료 및 방법 지속 업데이트 예정. 
