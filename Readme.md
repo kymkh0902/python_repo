@@ -3,7 +3,7 @@
 # 1. Python
 
 ### - Anaconda 다운로드 및 설치 진행
-  (https://repo.continuum.io/archive/Anaconda3-4.3.1-Windows-x86.exe)
+  (https://repo.continuum.io/archive/Anaconda2-4.2.0-Windows-x86.exe)
 
 - 설치 경로 : **Cloud PC 내** C:\anaconda 경로에 설치
 
