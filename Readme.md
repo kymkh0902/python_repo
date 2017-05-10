@@ -35,10 +35,10 @@ print(s)
 # 2. GitHub 
 
 
-### - GitHub 다운로드 및 설치 진행.
+### - GitHub 다운로드 및 설치 진행. 
    (https://github-windows.s3.amazonaws.com/GitHubSetup.exe)
 
-- 설치가 다 되면 Github, Git Shell 아이콘이 생성될 것입니다.
+- 위 링크에서 받아서 로컬에 설치해주시면 됩니다. 설치가 다 되면 Github, Git Shell 아이콘이 생성될 것입니다.
 
 ![icon1](https://cloud.githubusercontent.com/assets/19977/10811251/25b3693c-7dc7-11e5-9776-bd21617477f1.png)
 
