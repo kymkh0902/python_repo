@@ -66,6 +66,8 @@ print(s)
 2) Python 기본 문법 학습 
   	- Learn python the hard way라는 교재 내용을 바탕으로 진행할 예정입니다. 추가 학습 필요 시 아래 링크 참조
           (https://learnpythonthehardway.org/book/)
+	- Byte of Python 이라는 책도 좋아합니다. 
+	  (http://byteofpython-korean.sourceforge.net/byte_of_python.pdf)
 
 3) 데이터 분석을 위한 Library 학습(pandas)
 
