@@ -1,0 +1,167 @@
+
+
+함수 지정
+- **Function** : 복잡한 코딩을 하나의 함수(function)으로 명명해주어 매번 복잡한 코딩하지 않고 재사용할 수 있도록 해줍니다.
+```python
+def func_name(variable1, variable2...):         # func_name:함수명, variable1:변수1, variable2:변수2
+    result = write_code(variable1, variable2...)  # result에 write_code를 대입한다. 
+    return result                                 # result값을 반환한다.
+```
+
+
+
+제어문
+- **제어문** : if, while, for문이 존재하며 세 제어문을 활용하여 필요한 모든 로직을 구상할 수 있다. (a : 변수, b : 조건, c : 실행) 
+  - if : 만약 ~ a가 b하면 c를 한다 
+  - while : a가 b할 때까지 c를 한다
+  - for : ~a에 대해 ~c를 한다.
+
+
+
+    1. 예제 1(if) :
+```python
+variable = 5                      # 변수의 값에 5를 대입한다.
+if variable < 10:                 # 변수가 10보다 작다면 (조건)
+            variable = variable + 1      # 변수에 1을 더해라 
+else:                             # 변수가 10보다 작지 않으면 (조건)
+            print(variable)              # 변수를 출력한다.
+```
+
+    2. 예제 2(While) : 
+```python
+variable = 5                      # 변수의 값에 5를 대입한다. 
+while variable < 10:              # 변수가 10보다 작을 동안(조건) 
+            variable = variable + 1      # 변수에 1을 더해라
+            print(variable)              # 변수를 출력한다. 
+```
+
+    3. 예제 3(for) :
+```python
+for variable in range(0, 10):    # 0~10 사이의 범위 안의 값(variable)을
+            print(variable)             # 출력한다. 
+
+
+
+# 예제6) if문을 학습해봅니다. 
+
+#1. n_polarizer_1, n_polarizer_2에 각각 10, 20을 대입합니다.
+
+#2. 위 두 변수의 값을 비교해서 같지 않을 경우 n_polarizer_2에서 2를 빼줍니다. 
+
+#3. 두 값을 출력해봅니다. 
+
+n_polarizer_1, n_polarizer_2 = 10, 20
+if n_polarizer_1 != n_polarizer_2 :
+    n_polarizer_2+2
+    print(n_polarizer_1, n_polarizer_2)
+
+
+
+# 예제7) for문, if문을 학습해봅니다.
+
+#1 0~9까지의 숫자 중에서 (range함수 사용하세요)
+
+#2 2의 배수 (2로 나눠서 0)인 값만
+
+#3 출력합니다. 
+
+for var in range(0, 10):
+    if var%2==0:
+        print(var)
+
+
+
+### 기초 문법
+
+- **데이터 구조** 
+    1. 내장 : 파이썬은 list, tuple, dictionary 등의 데이터 구조를 갖습니다. 데이터를 담는 용기의 종류가 여러가지 있구나 라고 생각하세요.
+        - list : [] 안에 데이터를 입력합니다. 변수를 선언한 후에 추가 데이터를 입력하실 경우 append함수를 사용해줍니다. 데이터 범위 설정의 경우 data[a:b]의 형식으로 선택합니다.
+        ```python
+        num = [1,2,3,4]
+        num.append(5)
+        num[1:4]  ##파이썬은 처음이 0이고, 1:4는 첫번째부터 4번째까지
+        ```
+        - dict : {} 안에 데이터를 입력합니다. 안에 들어가는 데이터는 key, value의 쌍으로 이루어지며 key:value의 형태로 입력됩니다.
+        추가 데이터를 입력하실 경우 update함수를 사용해줍니다. 데이터 범위 설정의 경우 data['key']의 형식으로 선택합니다. 
+        ```python
+        num = {'one' : 1, 'two' : 2, 'three' : 3}
+        num.update({'four' : 4})
+        num['one']
+        ```
+        key, value 가지고 오기
+        num.keys()
+        num.values() 
+   
+
+    2. 외장 : Package들 중에 필요성에 따라 데이터 구조를 추가적으로 지원하는 형식들이 있습니다. numpy의 array, pandas의 dataframe 이 대표적인 예입니다. (이 후 pandas 학습 시에 학습 예정입니다.)  
+
+
+- **내장 함수**
+
+    1. lambda : 함수를 축약해서 사용 한다고 보면 됩니다. def ~ 를 입력하지 않아도 간편하게 함수 역할을 할 수 있습니다.
+    ```python
+    sum = lambda a, b : a + b   # sum을 a,b가 주어졌을 때 a+b를 return하는 함수라고 한다.
+    sum(1,3)                    # sum에 1,3을 넣어준다. 
+    ```        
+
+    2. apply : 함수, 데이터를 받으며 데이터를 함수에 맞게 가공해서 새로운 데이터로 변환합니다. (예제는 이 후에)
+    
+    3. len : 데이터 구조 안에 있는 데이터의 수를 반환해줍니다. (단일 문자의 경우 단위 문자 개수를 반환합니다.)
+```python 
+alp = ['a','b','c']        
+len(alp)                   # alp 데이터의 개수를 반환한다.
+len(alp[0])                # alp[0] 데이터의 길이를 반환한다. 
+```    
+
+    4. int/float : 정수형/소수형으로 데이터를 변환합니다. 숫자 모양을 띈 문자('1', '2')도 해당 데이터 형태로 변환됩니다. 
+    ```python
+    one = '1'
+    int(one)                   # one이라는 데이터의 type을 정수형으로 변환한다.
+    float(one)                 # one이라는 데이터의 type을 소수형으로 변환한다. 
+    ```
+
+    5. str : 문자형으로 데이터를 변환합니다. 
+    ```python
+    one = 1           
+    str(one)                   # one이라는 데이터의 type을 문자형으로 변환한다. 
+    ``` 
+
+    6. max/min : 데이터 내 최대/최소값을 반환합니다.
+    ```python
+    num = [1, 2, 3]
+    max(num)                   # num의 최대값을 반환한다.
+    min(num)                   # num의 최소값을 반환한다. 
+    ```
+
+    7. range : 숫자 a ~ b(설정 필요)까지의 범위의 데이터를 가집니다.
+    ```python
+    num = []
+    for i in range(0,10):      # 0부터 9까지 값을 num에 추가한다.
+            num.append(i)
+    
+    [i for i in range(0,10)]   # 위와 같은 내용 
+    [i for i in range(10)]     # 위와 같은 내용 
+    [i for i in range(0,10,2)] # 0부터 9까지 값을 2씩 건너뛰면서 추가한다.
+    ```
+
+    8. type : 데이터 type을 반환합니다.
+    ```python
+    a = 1
+    b = '1'
+    type(a), type(b)           # a의 type, b의 type을 반환한다.
+    ```
+
+    9. enumerate : list, tuple 등의 데이터를 열거할 때(iteration) 데이터 번호를 매겨주는 역할을 해줍니다.  
+    ```python
+    a = [1,2,3,4]
+    for i, j in enumerate(a):  # a의 순서, 값을 순서대로 출력한다. 
+            print(i, j)
+    ```
+
+    10. zip : 2개 이상의 데이터 구조를 묶어줍니다. 구조들을 열거할 때 사용합니다.
+    ```python
+    a = [1,2,3,4]
+    b = range(len(a))
+    for i, j in zip(a,b):      # a와 b에 대해 순서대로 1개의 값씩 출력한다. (a, b의 len이 다를 경우 데이터 수가 적은 양만큼만 출력한다.) 
+            print(i,j)
+    ```
