@@ -44,7 +44,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 1,
+   "execution_count": 19,
    "metadata": {
     "collapsed": false
    },
@@ -52,19 +52,19 @@
     {
      "data": {
       "text/plain": [
-       "'C:\\\\Users\\\\LG\\\\Documents\\\\GitHub\\\\optical_python\\\\Class'"
+       "'C:\\\\Users\\\\lg\\\\Documents'"
       ]
      },
-     "execution_count": 1,
+     "execution_count": 19,
      "metadata": {},
      "output_type": "execute_result"
     }
    ],
    "source": [
     "# 예제1) os package에서 getcwd라는 함수를 import해보자. \n",
-    "# 예제2) import한 getcwd를 실행시켜보자.\n",
-    "from os import getcwd\n",
-    "getcwd()"
+    "# 예제2) import한 getcwd를 실행시켜보자\n",
+    "import os\n",
+    "os.getcwd()"
    ]
   },
   {
@@ -80,16 +80,18 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 12,
+   "execution_count": 23,
    "metadata": {
     "collapsed": false
    },
    "outputs": [],
    "source": [
-    "# 예제3) OS package 전체를 import한 후에 현재 작업 폴더를 D:/#.Secure Work Folder/Github/optical_python 으로 설정해보세요\n",
+    "# 예제3) OS package 전체를 import한 후에 현재 작업 폴더를 Secure Folder\\Github\\optical_python 으로 설정해보세요\n",
     "# 예제4) 현재 작업 폴더에 'class_material' 이라는 폴더를 만들어보세요\n",
     "\n",
-    "path = '/#.Secure Work Folder'"
+    "os.chdir('D:/#.Secure Work Folder/optical_python')\n",
+    "os.getcwd()\n",
+    "os.mkdir('class_material')\n"
    ]
   },
   {
@@ -100,21 +102,39 @@
     "```python\n",
     "def func_name(variable1, variable2...):         # func_name:함수명, variable1:변수1, variable2:변수2\n",
     "    result = write_code(variable1, variable2...)  # result에 write_code를 대입한다. \n",
-    "    return result                                 # result값을 반환한다.\n",
-    "```"
+    "    return result                                 # result값을 반환한다."
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 16,
+   "execution_count": 58,
    "metadata": {
-    "collapsed": true
+    "collapsed": false
    },
-   "outputs": [],
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "6"
+      ]
+     },
+     "execution_count": 58,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
    "source": [
     "# 예제5) 변수 a,b를 갖는 Add라는 이름을 갖는 함수를 만듭니다. 함수 내에 a와 b를 더해서 c에 저장합니다. 그리고 c 값을 return 해줍니다.\n",
     "\n",
-    "# 위에서 완성한 Add라는 함수에 1, 2 값을 넣어서 결과를 봅시다. "
+    "# 위에서 완성한 Add라는 함수에 1, 2 값을 넣어서 결과를 봅시다. \n",
+    "\n",
+    "\n",
+    "def Add(a,b):\n",
+    "   c = a+b\n",
+    "\n",
+    "   return(c)\n",
+    "\n",
+    "Add(1,5)"
    ]
   },
   {
