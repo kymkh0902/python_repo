@@ -11,7 +11,7 @@
 <a href="url"><img src="http://cfile4.uf.tistory.com/image/264A3A45589AC1EF096294" align="center" height="300" width="550" ></a> <a href="url"><img src="http://cfile5.uf.tistory.com/image/2559F445589AC1F036C02D" align="center" height="300" width="550" ></a> 
 
 ### - 실행 확인
-- 설치 완료 후에 윈도우 검색 창에서 ***Jupyter Notebook, Spyder*** 실행한 후에 아래 내용을 입/출력해봅니다. 
+- 설치 완료 후에 윈도우 검색 창에서 ***Jupyter Notebook, Spyder***를 각각 실행한 후에 아래 내용을 입/출력해봅니다. 
 	
 ```python
 s = "Hello World"
@@ -49,7 +49,7 @@ print(s)
 - 수업 홈페이지에 접속해서 각자 컴퓨터에 Clone(파일을 내 컴퓨터에 복사하는 과정)합니다.
 (https://github.com/kymkh0902/optical_python/)
 
-- 아래와 같이 Clone - Open in Desktop 누르시면 GitHub가 켜지면서 저장 경로가 뜰 겁니다. 경로는 Secure Folder\Github에 저장해주세요. 
+- 아래와 같이 Clone - Open in Desktop 누르시면 GitHub가 켜지면서 저장 경로가 뜰 겁니다. 경로는 D:/#.Secure Work Folder/GitHub에 저장해주세요. 
 
 ![Clone](pictures/github_clone.PNG)
 
@@ -64,7 +64,7 @@ print(s)
 	- 학습 및 활용 방안 Guide 제시 
 
 2) Python 기본 문법 학습 
-  	- Learn python the hard way라는 교재 내용을 바탕으로 진행할 예정입니다. 추가 학습 필요 시 아래 링크 참조
+  	- Learn python the hard way라는 교재 내용을 바탕으로 요약해서 진행할 예정입니다. 추가 학습 필요 시 아래 링크 참조
           (https://learnpythonthehardway.org/book/)
 	- Byte of Python 이라는 책도 좋아합니다. 
 	  (http://byteofpython-korean.sourceforge.net/byte_of_python.pdf)
