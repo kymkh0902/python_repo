@@ -51,7 +51,38 @@ slitting_row_1 = width - nullingwidth_1 - (slittingwidth_2 + nullingwidth_2)
 slitting_row_2 = width - nullingwidth_1 - slittingwidth_1 - nullingwidth_2
 
 
-
 #4. 수율을 구한다.
 
+  #1) 원단을 2개로 나누세요(slitting)
+     # pandas 조건문, x좌표 조건 활용.
+  #2) 나뉜 원단을 Chip 장변, 단변으로 쪼개 봅시다. 
+     # pd.cut 함수 활용.
+  #3) 전체 Chip 개수를 확인합니다.  
+     # len 함수 활용.
+  #4) 불량 Chip 개수를 확인합시다. 불량 유형을 보고 강/약으로 구분해야겠죠
+     # apply, lambda 함수 
+  #5) 동일 chip 내에 불량을 1개만 세야하니까 중복된 값들을 제거합시다.
+     # cut으로 x, y 나눈 값 사용. drop_duplicates 함수 
+  #6) 불량 chip을 세봅시다.
+     # len 함수 활용.
+  #7) 수율을 구합니다.
+     # 사칙연산
+     
+     
+#5. 자동화를 합니다.
 
+# for Lot in [수율 구하려는 Lot List](MES): 
+  
+  #1) DAS에서 데이터를 불러옵니다. (DAS)
+
+  #2) 원단의 길이, 폭 등 정보를 불러옵니다. (MES)
+   
+  #3) Slitting 시에 재권취가 되었는지 안 되었는지를 확인합니다. (MES)
+
+  #4) 이제 위에서 진행한 로직 그대로 적용하시면 원하는 모든 Lot에 대한 수율을 구할 수 있습니다. 
+
+
+# ※ 사소하지만 더 자동화 할 수 있는 것들을 찾아주세요. 사람 손을 안 타면 안 탈 수록 실수가 줄어듭니다. 
+     
+
+     
