@@ -21,6 +21,7 @@ Project1 : 투입실적 Lot 자동매칭
         package : pyodbc
         변수 : db1
         함수 : pyodbc(connect)  # 그냥 복사 붙여넣기 했음
+        
     c. 검사 Lot(15자리) 에 연신, 코팅 Lot을 불러와 matching
         변수 : input_data['Lot No.']
         함수 : Lot추적 (추후 공유)
@@ -52,3 +53,5 @@ Project2 : OLED모델 테크노시스 - 알파텍 이송 후 Curl NG율 계산
     c. Data를 excel 로 내보낸다.
         변수 : data_result
         함수 : pd.to_excel
+
+Porject3 : 코팅 초기롤 찾기 + 검사실적 / 자동검사기 data 매칭
