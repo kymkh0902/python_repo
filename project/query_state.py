@@ -1,14 +1,14 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 Created on Wed Jan 11 12:28:08 2017
 
 @author: whikwon
 """
 
+
 #폭 찾기
 def find_width(lot):
-    return("select a.prod_nm from tb_iem903 a, tb_iem120 b where a.prod_cd = b.prod_cd and b.unique_lot_no = '{}'".format(lot)
-)
+    return("select a.prod_nm from tb_iem903 a, tb_iem120 b where a.prod_cd = b.prod_cd and b.unique_lot_no = '{}'".format(lot))
 
 #DAS data 
 def find_das(lot):
@@ -20,11 +20,12 @@ def find_length(lot):
 
 #Lot 찾기
 def find_lot(date1, date2, grade):
-    return("select F_ONE_LOT_TRACE_T(ar_warhs_create_no, '_E%', '%%') as 연신Lot, unique_lot_no as 코팅Lot, prod_cd as 코드, normal_qty + normal_corr_qty as prod_qty from tb_iem120 where prod_date between '{}' and '{}' and prod_cd like '%{}%' and prod_wc_cd like '%_C%'".format(date1, date2, grade))
+    return("select F_ONE_LOT_TRACE_T(ar_warhs_create_no, '_E%', '%%') as 연신Lot, unique_lot_no as 코팅Lot, normal_qty + normal_corr_qty as prod_qty from tb_iem120 where prod_date between '{}' and '{}' and prod_cd like '%{}%' and prod_wc_cd like '%_C%'".format(date1, date2, grade))
     
 def find_lot1(lot):
     return("select F_ONE_LOT_TRACE_T(ar_warhs_create_no, '_E%', '%%') as 연신Lot, F_ONE_LOT_TRACE_T(ar_warhs_create_no, '_C%', '%%')  as 코팅Lot from tb_iem120 where unique_lot_no = '{}'".format(lot))
 
+    
 #Lot 10자리 --> 16자리 변경
 def lotchanger(lot):
     if len(lot) < 10:
@@ -34,8 +35,9 @@ def lotchanger(lot):
             return('201'+lot[0]+str(int(lot[1],16))+lot[2:6]+'0'+lot[6:10])  
         else:
             return('201'+lot[0]+'0'+str(int(lot[1],16))+lot[2:6]+'0'+lot[6:10])       
-    
-def lot_trace(lot): 
+            
+#전체 Lot 추적    
+def lottrace_whole(lot): 
     return('''
                     SELECT
                     DECODE(LEVEL_CD,'0',UNIQUE_LOT_NO)  AS LOT1
@@ -209,8 +211,8 @@ def lot_trace(lot):
             '''.format(lot, lot, lot)
             )
                                               
-                                                                                          
-def hq_inspection(date1, date2):
+#본사 검사실적                                                                                          
+def hq_inspection(start_date, end_date):
     return(
     '''       
        SELECT *
@@ -1519,28 +1521,53 @@ def hq_inspection(date1, date2):
                 AND S.I_BE_AR_NO = U.AR_WARHS_CREATE_NO(+)
          )
 
-         '''.format(date1, date2, date1, date2)
+         '''.format(start_date, end_date, start_date, end_date)
          )                                                                    
                                                                                
-#lot 이력 찾기                                                                               
-def lottracer(lot):
+#연신, 코팅 Lot 추적                                                                               
+def lottrace(lot):
     return(
     '''
-    select unique_lot_no, prod_cd, prod_wc_cd, norm_qty from
+    SELECT unique_lot_no, prod_cd, prod_wc_cd, norm_qty FROM
 
-	(select distinct unique_lot_no, prod_cd, prod_wc_cd, norm_qty from
-		(select unique_lot_no, prod_date, prod_wc_cd, prod_seq_no, o_global_create_no, i_global_create_no, prod_cd, normal_qty + normal_corr_qty norm_qty from tb_iem120,
-		(select o_global_create_no, i_global_create_no from tb_iem131 a, tb_iem120 b where a.i_global_create_no = b.global_create_no and a.del_flag = 'A'and b.prod_wc_cd like '%%')
-		where o_global_create_no = global_create_no)
-		start with prod_date = '{}' and prod_wc_cd = '{}' and prod_seq_no = '{}'
-		connect by prior i_global_create_no = o_global_create_no)
+	(SELECT DISTINCT unique_lot_no, prod_cd, prod_wc_cd, norm_qty FROM
+ 
+		(SELECT unique_lot_no, prod_date, prod_wc_cd, prod_seq_no, o_global_create_no, i_global_create_no, prod_cd, normal_qty + normal_corr_qty norm_qty FROM tb_iem120,
+		
+           (SELECT o_global_create_no, i_global_create_no FROM tb_iem131 a, tb_iem120 b WHERE a.i_global_create_no = b.global_create_no AND a.del_flag = 'A' AND b.prod_wc_cd LIKE '%%')
+		WHERE o_global_create_no = global_create_no)
+  
+		START WITH prod_date = '{}' AND prod_wc_cd = '{}' AND prod_seq_no = '{}'
+		CONNECT BY PRIOR i_global_create_no = o_global_create_no)
 
-    where substr(prod_wc_cd, 2, 1) in ('E', 'C')         
-    and not substr(prod_cd, 3, 3) in ('APF')                   
+    WHERE SUBSTR(prod_wc_cd, 2, 1) in ('E', 'C')         
+    AND NOT SUBSTR(prod_cd, 3, 3) in ('APF')                   
     '''.format(lot[:8], lot[8:12], lot[12::]))
   
+#코팅 Lot 추적
+def lottrace2(lot):
+    return(
+   '''
+    SELECT unique_lot_no, prod_cd, prod_wc_cd, norm_qty FROM
 
-def yt_inspection(date1, date2):
+	(SELECT DISTINCT unique_lot_no, prod_cd, prod_wc_cd, norm_qty FROM
+ 
+		(SELECT unique_lot_no, prod_date, prod_wc_cd, prod_seq_no, o_global_create_no, i_global_create_no, prod_cd, normal_qty + normal_corr_qty norm_qty FROM tb_iem120,
+		
+           (SELECT o_global_create_no, i_global_create_no FROM tb_iem131 a, tb_iem120 b WHERE a.i_global_create_no = b.global_create_no AND a.del_flag = 'A' AND b.prod_wc_cd LIKE '%%')
+		WHERE o_global_create_no = global_create_no)
+  
+		START WITH prod_date = '{}' AND prod_wc_cd = '{}' AND prod_seq_no = '{}'
+		CONNECT BY PRIOR i_global_create_no = o_global_create_no)
+
+    WHERE SUBSTR(prod_wc_cd, 2, 1) in ('E', 'C')         
+    AND NOT SUBSTR(prod_cd, 3, 3) in ('APF')                      
+    '''.format(lot[:8], lot[8:12], lot[12::]))
+
+
+
+#연태 검사실적
+def yt_inspection(start_date, end_date):
     return(
     '''
     SELECT X.global_create_no, Z.unique_lot_no 재단, 검사, 투입수, 불량수, 불량명, 코드, 제품명, 생산호기, z.remark from
@@ -1574,31 +1601,73 @@ def yt_inspection(date1, date2):
     WHERE X.global_create_no = Y.o_global_create_no AND 
     
     Z.global_create_no = Y.i_global_create_no
-    '''.format(date1, date2)
+    '''.format(start_date, end_date)
     )
+                                                                         
     
+def lqms_data(code, start_date, end_date, *items):
+    
+    if len(items) == 1:
+        return(
+        '''
+        SELECT lot_no, c.prod_cd, b.measure_nm1, unit, a.measure_cnt, measure_value, then_usl, then_lsl, measure_judge FROM L_LOT_MEASURE_RESULT a,
 
+        (SELECT measure_cd, measure_nm1, unit FROM L_MEASURE_MASTER WHERE global_site_cd = 'KROC01') b,
+    
+        tb_iem120@iepcs c
+    
+        WHERE a.measure_cd = b.measure_cd
+    
+        AND lot_no = c.unique_lot_no
+    
+        AND prod_cd like '%{}%'
+    
+        AND prod_date between '{}' and '{}'
+    
+        AND measure_nm1 = '{}'
+    
+        '''.format(code, start_date, end_date, items[0])
+        )
+        
+    if len(items) > 1:
+        return(
+        '''
+        SELECT lot_no, c.prod_cd, b.measure_nm1, unit, a.measure_cnt, measure_value, then_usl, then_lsl, measure_judge FROM L_LOT_MEASURE_RESULT a,
 
-def glass_adhesive(grade, date1, date2):
-    return(
-    '''
-    SELECT lot_no, c.prod_cd, a.measure_cd, b.measure_nm1, unit, a.measure_cnt, measure_value, then_usl, then_lsl, measure_judge FROM L_LOT_MEASURE_RESULT a,
+        (SELECT measure_cd, measure_nm1, unit FROM L_MEASURE_MASTER WHERE global_site_cd = 'KROC01') b,
+    
+        tb_iem120@iepcs c
+    
+        WHERE a.measure_cd = b.measure_cd
+    
+        AND lot_no = c.unique_lot_no
+    
+        AND prod_cd like '%{}%'
+    
+        AND prod_date between '{}' and '{}'
+    
+        AND measure_nm1 in {}
+    
+        '''.format(code, start_date, end_date, items)
+        )        
+        
+    else:
+        return( 
+        '''
+        SELECT lot_no, c.prod_cd, b.measure_nm1, unit, a.measure_cnt, measure_value, then_usl, then_lsl, measure_judge FROM L_LOT_MEASURE_RESULT a,
 
-    (SELECT measure_cd, measure_nm1, unit FROM L_MEASURE_MASTER WHERE global_site_cd = 'KROC01') b,
-
-    tb_iem120@iepcs c
-
-    WHERE a.measure_cd = b.measure_cd
-
-    AND lot_no = c.unique_lot_no
-
-    AND prod_cd like '%{}%'
-
-    AND prod_date between '{}' and '{}'
-
-    AND measure_nm1 = 'Glass 점착력'
-
-    '''.format(grade, date1, date2)
-    )
-                                                                               
-                                                                              
+        (SELECT measure_cd, measure_nm1, unit FROM L_MEASURE_MASTER WHERE global_site_cd = 'KROC01') b,
+    
+        tb_iem120@iepcs c
+    
+        WHERE a.measure_cd = b.measure_cd
+    
+        AND lot_no = c.unique_lot_no
+    
+        AND prod_cd like '%{}%'
+    
+        AND prod_date between '{}' and '{}'
+        
+        '''.format(code, start_date, end_date)
+        )
+                                                                                  

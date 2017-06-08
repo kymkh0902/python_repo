@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 Created on Thu Jun  1 11:54:34 2017
 
@@ -8,7 +8,11 @@ Created on Thu Jun  1 11:54:34 2017
 import pandas as pd
 import pyodbc
 import query_state as qs
+import matplotlib.pyplot as plt
+import seaborn as sns
 
+sns.set_style('whitegrid')
+sns.set_context('notebook')
 
 """Database 목록"""
 
@@ -37,9 +41,10 @@ db3 = pyodbc.connect(
 db4 = pyodbc.connect(
     r'DRIVER={Oracle in OraClient11g_home1};'
     r'DBQ=oc_tqms1;'
-    r'UID=qms_view;'
+    r'UID=lqms_view;'
     r'PWD=viewdb7388;'               
     )
+
 
 """기타 정보"""
 columns = ['불량명','lot','카메라 번호', 'size(max)','size(min)','value','불량번호','x','y']
@@ -151,11 +156,11 @@ class preprocessing():
         Parameters
         ----------
         data : 입력 데이터(dataframe)        
-        *args : 데이터 불량 번호(int), 순차적으로 입력
+        *args : 데이터 불량 번호(str), 순차적으로 입력
         
         Returns
         -------
-        data : 수정된 데이터 (dataframe)
+        X : 수정된 데이터 (dataframe)
 
         """
         X = data.copy()
@@ -192,11 +197,83 @@ class preprocessing():
 
         return slit1, slit2
         
+
+        
+class plot():     
+    """
+    그래프 그릴 때 사용한다.
+    """
     
+    def scatter(data1, width, length, figsize = (12, 8), data2 = None):
+        """
+        scatter plot
+        
+        Parameter
+        ---------
+        data1 : 입력 데이터(dataframe)/'강' 불량 입력
+        width : 폭(int)
+        length : 길이(int)
+        figsize : 그래프 크기
+        data2 : 입력 데이터(dataframe)/'약' 불량 입력
+        
+        Return
+        ------
+        fig : 그래프 
+        
+        """
+        fig, ax = plt.subplots(1,1, figsize = figsize)
+        ax.scatter(data1['x'], data1['y'], s = 10, c = 'r', linewidth = 0)
+        
+        if data2:
+            ax.scatter(data2['x'], data2['y'], s = 10, c = 'b', linewidth = 0)
+    
+        ax.set_xlim(0,data1['x'].max()) 
+        ax.set_ylim(0,data1['y'].max()) 
+        ax.set_xticks([i for i in range(0, width, 100)]+[width])  
+        ax.set_yticks([i for i in range(0, length, 100)]+[length]) 
+        ax.tick_params(axis = 'both', which = 'both', length = 0) 
+        ax.spines['top'].set_visible(False) 
+        ax.grid('off')
+            
+        return fig
+        
+        
+    def heatmap(data, bins_size, bins_value, labels_size, labels_value, figsize = (12,8)):    
+        """
+        heatmap plot
+        
+        Parameter
+        ---------
+        data : 입력 데이터(dataframe)
+        bins_size : size 나눌 값(list)
+        bins_value : value 나눌 값(list)
+        labels_size : size 나눌 label(list)
+        labels_value : value 나눌 label(list)
+        figsize : 그래프 크기
+        
+        Return
+        ------
+        fig : 그래프
+        
+        """
+        X = data.copy()
+        X['cut_size'] = pd.cut(X['size'], bins_size, labels = labels_size)
+        X['cut_value'] = pd.cut(X['value'], bins_value, labels = labels_value)
+        X = X.groupby(by = ['cut_size','cut_value']).size().reset_index(name = 'quantity')
+        X = X.pivot('cut_size','cut_value','quantity')
+        
+        fig, ax = plt.subplots(1,1, figsize = figsize)
+        x = sns.heatmap(X, annot = True, fmt = '2g')
+        x.invert_yaxis()  
+    
+        return fig
+                
+
+        
               
 def read_data(lot):   
     """
-    데이터 불러오기 
+    데이터 불러오기(DAS)
     
     Parameters
     ----------
@@ -217,6 +294,23 @@ def read_data(lot):
     
     
     
+def read_excel(file_path):
+    """
+    데이터 불러오기(txt,csv)
+    
+    Parmaters
+    ---------
+    file_path : 파일 경로
+    
+    Returns
+    -------
+    data : 파일의 코팅 raw-data
+        
+    """
+    '업데이트 예정'
+    
+  
+    
 def read_lot_info(lot):
     """
     lot 정보 불러오기(width, length)
@@ -230,11 +324,13 @@ def read_lot_info(lot):
     width, length : 폭, 길이(tuple)
     
     """
-    width = width_list[pd.read_sql_query(qs.find_width(lot), db2).iloc[0][0][:2]]
-    length = pd.read_sql_query(qs.find_length(lot), db2).iloc[0][0]
+    width = int(width_list[pd.read_sql_query(qs.find_width(lot), db2).iloc[0][0][:2]])
+    length = int(pd.read_sql_query(qs.find_length(lot), db2).iloc[0][0])
 
     return width, length
 
+    
+    
 def chip_qty(width, length, inch_x, inch_y, axis, pitch = None):
     """
     원단을 chip으로 잘랐을 때 chip 개수
@@ -265,6 +361,7 @@ def chip_qty(width, length, inch_x, inch_y, axis, pitch = None):
     
     return chip_qty
     
+    
 
 def division(data, width, length, inch_x, inch_y, axis, pitch = None):
     """
@@ -282,7 +379,7 @@ def division(data, width, length, inch_x, inch_y, axis, pitch = None):
 
     Returns
     -------
-    data, total_qty : 수정된 데이터, 총 chip 수량(tuple)
+    X, total_qty : 수정된 데이터, 총 chip 수량(tuple)
     
     """
     
@@ -303,4 +400,3 @@ def division(data, width, length, inch_x, inch_y, axis, pitch = None):
     chip_qty = len(labels_x) * len(labels_y)
     
     return X, chip_qty
-  
