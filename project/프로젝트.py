@@ -31,33 +31,59 @@ os.chdir('//Client/D$/#.Secure Work Folder/Github/optical_python/project') #작�
 import pandas as pd
 data = pd.read_excel('x20170418DC02025.xlsx', sheetnames = 'das_defect_raw_20170418DC02025') #코팅Lot의 마킹 정보를 불러온다
 
+data['FAULT_YPOS'] = data['FAULT_YPOS']/1000    # 자동마킹 위치 데이타를 mm에서 m로 변경
 
 #2.원단 폭/길이, 슬리팅 폭, 널링부/scrap, 모델 사이즈를 입력한다
 
 width = 2250                  # 코팅 원단 폭 입력
 length = 1350                 # 코팅 원단 길이 입력
-nullingwidth_1 = 30           # 사이드 널링부 입력
-slittingwidth_1 = 1219.4      # 슬리팅 원단 1 폭 입력
-slittingwidth_2 = 1219.4      # 슬리팅 원단 2 폭 입력
-nullingwidth_2 = width - (nullingwidth_1 + slittingwidth_1 + slittingwidth_2)  #반대쪽 사이드 널링 폭
-model_define = 0              # 상폴/하폴 구분을 위해 흡수축 입력 → 장변, 단변 변수에 자동적으로 입력되도록 하기 위해 설정한 것임
-model_X = 1219.4              # 모델 장변
-model_Y = 691.2               # 모델 단변
+NW_1 = 30                     # 사이드 널링부 입력
+SW_1 = 1219.4                 # 슬리팅 원단 1 폭 입력
+SW_2 = 951.0                  # 슬리팅 원단 2 폭 입력
+NW_2 = width - (NW_1 + SW_1 + SW_2)  #반대쪽 사이드 널링 폭
+model_define = 90              # 상폴/하폴 구분을 위해 흡수축 입력 → 장변, 단변 변수에 자동적으로 입력되도록 하기 위해 설정한 것임
+
+
+model1_X = 1219.4              # 1번째 슬리팅 모델 장변
+model1_Y = 691.2               # 1번째 슬리팅 모델 단변
+model2_X = 951.0               # 2번째 슬리팅 모델 장변
+model2_Y = 539.4               # 2번째 슬리팅 모델 단변
+
+if model_define == 0:
+    model1_X, model1_Y = model1_Y, model1_X
+    model2_X, model2_Y = model2_Y, model2_X
+
+    
+model1_Y =  model1_Y/1000
+model2_Y =  model2_Y/1000
+
 
 
 #3. 슬리팅을 친다.
 
-slitting_row_1 = width - nullingwidth_1 - (slittingwidth_2 + nullingwidth_2)
-slitting_row_2 = width - nullingwidth_1 - slittingwidth_1 - nullingwidth_2
+S_row_1 = width - NW_1 - (SW_2 + NW_2)        # 1번째 슬리팅 폭
+S_row_2 = width - NW_1 - SW_1 - NW_2         # 2번째 슬리팅 폭
 
-
+#%%
 #4. 수율을 구한다.
 
-  #1) 원단을 2개로 나누세요(slitting)
+ #1) 원단을 2개로 나누세요(slitting)
      # pandas 조건문, x좌표 조건 활용.
+
+S_marking_1 = data[(data['FAULT_XPOS'] > NW_1) & (data['FAULT_XPOS'] <= (NW_1 + SW_1))]           # 1번째 슬리팅 data 가져오기
+S_marking_2 = data[(data['FAULT_XPOS'] > (NW_1 + SW_1)) & (data['FAULT_XPOS'] < (NW_1 + SW_1 + SW_2))]  # 2번째 슬리팅 data 가져오기
+
+#%%
+
   #2) 나뉜 원단을 Chip 장변, 단변으로 쪼개 봅시다. 
      # pd.cut 함수 활용.
-  #3) 전체 Chip 개수를 확인합니다.  
+
+cut_slitting_1 = pd.cut(data['FAULT_YPOS'], bins = [i*model1_Y for i in range(0, int(length*1000/model1_Y), 
+                        labels =   )])     #자동마킹이 어디 위치해 있는지 구분해줌
+         
+     
+     
+     #3) 전체 Chip 개수를 확인합니다.  
      # len 함수 활용.
   #4) 불량 Chip 개수를 확인합시다. 불량 유형을 보고 강/약으로 구분해야겠죠
      # apply, lambda 함수 
