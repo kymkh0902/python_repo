@@ -38,9 +38,9 @@ db4 = pyodbc.connect(
     )
 
 
-class lqsm():
+class lqms():
     """LQMS 사용"""
-    def read_data(code, start_date, end_date, *items):
+    def read_data(prod_wc_cd, prod_cd, start_date, end_date, *items):
         """
         물성 데이터 불러올 때 사용한다.
         
@@ -57,6 +57,74 @@ class lqsm():
         
         """
         
-        X = pd.read_sql_query(qs.lqms_data(code, start_date, end_date, *items), db4)
+        X = pd.read_sql_query(qs.lqms_data(prod_wc_cd, prod_cd, start_date, end_date, *items), db4)        
         X.columns = ['lot','제품코드','물성','단위','n수','측정값','USL','LSL','판정']
+        X[['측정값','USL','LSL']] = X[['측정값','USL','LSL']].astype(float)
         return X
+        
+        
+def Cpk(data,d2=1.693):
+    """
+    Cpk 구할 때 사용한다.
+    
+    Parameters
+    ----------
+    data : 물성 데이터(dataframe)
+    d2 : 1.693 (n = 3) / 1.128 (n = 2)
+    
+    Returns
+    -------
+    Cpk : Cpk값(float)
+    
+    """
+    
+    usl = data['USL'].dropna().drop_duplicates()
+    lsl = data['LSL'].dropna().drop_duplicates()
+    if len(usl) + len(lsl) != 2:            
+        raise Exception('USL, LSL이 2개 이상 있거나 없습니다. 단일 grade, code인지 확인해보세요.')
+        
+    else:
+        usl, lsl = usl[0], lsl[0]
+
+    sigma = (data.groupby('lot')['측정값'].max() - data.groupby('lot')['측정값'].min()).mean()/d2
+    m = data['측정값'].mean()
+    Cpu = float(usl - m) / (3*sigma)
+    Cpl = float(m - lsl) / (3*sigma)
+    Cpk = min([Cpu, Cpl])
+    return Cpk
+    
+    
+def Ppk(data):
+    """
+    Ppk 구할 때 사용한다.
+    
+    Paramters
+    ---------
+    data : 물성 데이터(dataframe)
+    
+    Returns
+    -------
+    Ppk : Ppk값(float)
+    
+    """
+    
+    usl = data['USL'].dropna().drop_duplicates()
+    lsl = data['LSL'].dropna().drop_duplicates()
+    if len(usl) + len(lsl) != 2:            
+        raise Exception('USL, LSL이 2개 이상 있거나 없습니다. 단일 grade, code인지 확인해보세요.')
+        
+    else:
+        usl, lsl = usl[0], lsl[0]
+    sigma = data['측정값'].std()
+    m = data['측정값'].mean()
+    Ppu = float(usl - m) / (3*sigma)
+    Ppl = float(m - lsl) / (3*sigma)
+    Ppk = min([Ppu, Ppl])
+    return Ppk
+    
+        
+        
+
+
+
+        
