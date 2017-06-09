@@ -10,6 +10,10 @@ import pyodbc
 import query_state as qs
 import matplotlib.pyplot as plt
 import seaborn as sns
+from plotly.offline import init_notebook_mode, iplot
+from plotly.graph_objs import Scatter, Layout, Figure
+init_notebook_mode()
+
 
 sns.set_style('whitegrid')
 sns.set_context('notebook')
@@ -47,7 +51,7 @@ db4 = pyodbc.connect(
 
 
 """기타 정보"""
-columns = ['불량명','lot','카메라 번호', 'size(max)','size(min)','value','불량번호','x','y']
+columns = ['광학계','lot','카메라 번호', 'size(max)','size(min)','value','불량번호','x','y']
 width_list = {'W1' : 1280, 'W3' : 1400, 'W4' : 1930, 'W5' : 2200}
 
    
@@ -204,9 +208,9 @@ class plot():
     그래프 그릴 때 사용한다.
     """
     
-    def scatter(data1, width, length, figsize = (12, 8), data2 = None):
+    def scatter(lot, data1, width, length, figsize = (12, 8), data2 = None):
         """
-        scatter plot
+        scatter plot, 자동검사기 맵 출력
         
         Parameter
         ---------
@@ -234,13 +238,15 @@ class plot():
         ax.tick_params(axis = 'both', which = 'both', length = 0) 
         ax.spines['top'].set_visible(False) 
         ax.grid('off')
+        ax.title(lot)
             
         return fig
         
         
+        
     def heatmap(data, bins_size, bins_value, labels_size, labels_value, figsize = (12,8)):    
         """
-        heatmap plot
+        heatmap plot, 자동검사기 조건 별 마킹 개수 출력
         
         Parameter
         ---------
@@ -268,9 +274,83 @@ class plot():
     
         return fig
                 
-
+    
+class i_plot():
+    """
+    Interactive 그래프 그릴 때 사용한다.
+    """
+    
+    def scatter(lot, data, width, length, criteria = '광학계'):
+        """
+        Interactive plot, 자동검사기 맵 출력
         
+        Parameters
+        ----------
+        lot : lot(str)
+        data : 입력 데이터(dataframe)
+        width : 폭(int)
+        length : 길이(int)
+        criteria : 광학계/불량번호(str)
+        
+        Returns
+        -------
+        Jupyter 내 그래프 출력        
+        
+        """
+        
+        graph = []
+        defect_list = [i for i in data[criteria].drop_duplicates()]
+        for i in defect_list:            
+            trace = Scatter(
+                        x = data[data[criteria] == i]['x'],        
+                        y = data[data[criteria] == i]['y'],     
+                        mode = 'markers',
+                        hoverinfo = 'text',
+                        name = i,
+                        text = [i + '<br>size:%.2f<br>value:%.f'%(j,k) for j,k in zip(data['size'],data['value'])],
+                        marker = dict(
+                            size = 5
+                            )
+                        )
+            graph.append(trace)
+        
+        layout = Layout(
+                    title = lot,
+                    height = 900,
+                    width = 1000,
+                    hovermode = 'closest',
+                    xaxis = dict(
+                        title = 'X',
+                        mirror = 'ticks',
+                        showline = True,
+                        tick0 = 0,
+                        dtick = 100,
+                        autotick = False,
+                        showgrid = False,
+                        range = [0,width]
+                        ),
+                    yaxis = dict(
+                        title = 'Y',
+                        mirror = 'ticks',
+                        showline = True,
+                        tick0 = 0,
+                        dtick = 100,
+                        autotick = False,
+                        showgrid = True,
+                        range = [0,length]
+                        ),
+                    margin = dict(
+                        l=50,
+                        r=30,
+                        b=30,
+                        t=160,                
+                        )
+                    )
+        fig = Figure(data=graph, layout = layout)
+        iplot(fig)
+                
               
+        
 def read_data(lot):   
     """
     데이터 불러오기(DAS)

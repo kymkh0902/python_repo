@@ -8,7 +8,7 @@ Created on Wed Jan 11 12:28:08 2017
 
 #폭 찾기
 def find_width(lot):
-    return("select a.prod_nm from tb_iem903 a, tb_iem120 b where a.prod_cd = b.prod_cd and b.unique_lot_no = '{}'".format(lot))
+    return("SELECT a.prod_nm FROM tb_iem903 a, tb_iem120 b WHERE a.prod_cd = b.prod_cd AND b.unique_lot_no = '{}'".format(lot))
 
 #DAS data 
 def find_das(lot):
@@ -16,14 +16,14 @@ def find_das(lot):
     
 #생산량 찾기
 def find_length(lot):
-    return("select normal_qty + normal_corr_qty as 생산량 from tb_iem120 where unique_lot_no = '{}'".format(lot))
+    return("SELECT normal_qty + normal_corr_qty AS 생산량 FROM tb_iem120 WHERE unique_lot_no = '{}'".format(lot))
 
 #Lot 찾기
-def find_lot(date1, date2, grade):
-    return("select F_ONE_LOT_TRACE_T(ar_warhs_create_no, '_E%', '%%') as 연신Lot, unique_lot_no as 코팅Lot, normal_qty + normal_corr_qty as prod_qty from tb_iem120 where prod_date between '{}' and '{}' and prod_cd like '%{}%' and prod_wc_cd like '%_C%'".format(date1, date2, grade))
+def find_lot(start_date, end_date, grade):
+    return("SELECT F_ONE_LOT_TRACE_T(ar_warhs_create_no, '_E%', '%%') AS 연신Lot, unique_lot_no AS 코팅Lot, normal_qty + normal_corr_qty AS prod_qty FROM tb_iem120 WHERE prod_date BETWEEN '{}' AND '{}' AND prod_cd LIKE '%{}%' AND prod_wc_cd LIKE '%_C%'".format(start_date, end_date, grade))
     
 def find_lot1(lot):
-    return("select F_ONE_LOT_TRACE_T(ar_warhs_create_no, '_E%', '%%') as 연신Lot, F_ONE_LOT_TRACE_T(ar_warhs_create_no, '_C%', '%%')  as 코팅Lot from tb_iem120 where unique_lot_no = '{}'".format(lot))
+    return("SELECT F_ONE_LOT_TRACE_T(ar_warhs_create_no, '_E%', '%%') AS 연신Lot, F_ONE_LOT_TRACE_T(ar_warhs_create_no, '_C%', '%%')  AS 코팅Lot FROM tb_iem120 WHERE unique_lot_no = '{}'".format(lot))
 
     
 #Lot 10자리 --> 16자리 변경
@@ -1540,7 +1540,8 @@ def lottrace(lot):
 		START WITH prod_date = '{}' AND prod_wc_cd = '{}' AND prod_seq_no = '{}'
 		CONNECT BY PRIOR i_global_create_no = o_global_create_no)
 
-    WHERE SUBSTR(prod_wc_cd, 2, 1) in ('E', 'C')         
+    WHERE SUBSTR(prod_wc_cd, 2, 1) in ('E', 'C')    
+     
     AND NOT SUBSTR(prod_cd, 3, 3) in ('APF')                   
     '''.format(lot[:8], lot[8:12], lot[12::]))
   
@@ -1560,7 +1561,8 @@ def lottrace2(lot):
 		START WITH prod_date = '{}' AND prod_wc_cd = '{}' AND prod_seq_no = '{}'
 		CONNECT BY PRIOR i_global_create_no = o_global_create_no)
 
-    WHERE SUBSTR(prod_wc_cd, 2, 1) in ('E', 'C')         
+    WHERE SUBSTR(prod_wc_cd, 2, 1) in ('E', 'C')  
+       
     AND NOT SUBSTR(prod_cd, 3, 3) in ('APF')                      
     '''.format(lot[:8], lot[8:12], lot[12::]))
 
@@ -1570,7 +1572,7 @@ def lottrace2(lot):
 def yt_inspection(start_date, end_date):
     return(
     '''
-    SELECT X.global_create_no, Z.unique_lot_no 재단, 검사, 투입수, 불량수, 불량명, 코드, 제품명, 생산호기, z.remark from
+    SELECT X.global_create_no, Z.unique_lot_no 재단, 검사, 투입수, 불량수, 불량명, 코드, 제품명, 생산호기, z.remark FROM
 
         (SELECT 
               global_create_no, normal_qty 투입수, disproduct_qty 불량수, unique_lot_no 검사, d.prod_cd 코드, d.prod_nm 제품명, c.disp_factor_cd 불량명, prod_wc_cd 생산호기
@@ -1604,8 +1606,8 @@ def yt_inspection(start_date, end_date):
     '''.format(start_date, end_date)
     )
                                                                          
-    
-def lqms_data(code, start_date, end_date, *items):
+# LQMS 물성 데이터
+def lqms_data(prod_wc_cd, prod_cd, start_date, end_date, *items):
     
     if len(items) == 1:
         return(
@@ -1620,13 +1622,15 @@ def lqms_data(code, start_date, end_date, *items):
     
         AND lot_no = c.unique_lot_no
     
-        AND prod_cd like '%{}%'
+        AND lot_no LIKE '%{}%'
+        
+        AND prod_cd LIKE '%{}%'
     
-        AND prod_date between '{}' and '{}'
+        AND prod_date BETWEEN '{}' AND '{}'
     
         AND measure_nm1 = '{}'
     
-        '''.format(code, start_date, end_date, items[0])
+        '''.format(prod_wc_cd, prod_cd, start_date, end_date, items[0])
         )
         
     if len(items) > 1:
@@ -1642,13 +1646,15 @@ def lqms_data(code, start_date, end_date, *items):
     
         AND lot_no = c.unique_lot_no
     
-        AND prod_cd like '%{}%'
+        AND lot_no LIKE '%{}%'
+        
+        AND prod_cd LIKE '%{}%'
     
-        AND prod_date between '{}' and '{}'
+        AND prod_date BETWEEN '{}' AND '{}'
     
-        AND measure_nm1 in {}
+        AND measure_nm1 IN {}
     
-        '''.format(code, start_date, end_date, items)
+        '''.format(prod_wc_cd, prod_cd, start_date, end_date, items)
         )        
         
     else:
@@ -1664,10 +1670,12 @@ def lqms_data(code, start_date, end_date, *items):
     
         AND lot_no = c.unique_lot_no
     
-        AND prod_cd like '%{}%'
-    
-        AND prod_date between '{}' and '{}'
+        AND lot_no LIKE '%{}%'
         
-        '''.format(code, start_date, end_date)
+        AND prod_cd LIKE '%{}%'
+    
+        AND prod_date BETWEEN '{}' AND '{}'
+        
+        '''.format(prod_wc_cd, prod_cd, start_date, end_date)
         )
                                                                                   

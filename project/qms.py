@@ -38,6 +38,7 @@ db4 = pyodbc.connect(
     )
 
 
+
 class lqms():
     """LQMS »ç¿ë"""
     def read_data(prod_wc_cd, prod_cd, start_date, end_date, *items):
