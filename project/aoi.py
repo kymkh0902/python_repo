@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 Created on Thu Jun  1 11:54:34 2017
 
@@ -8,7 +8,16 @@ Created on Thu Jun  1 11:54:34 2017
 import pandas as pd
 import pyodbc
 import query_state as qs
+import matplotlib.pyplot as plt
+import seaborn as sns
+import warnings
+from plotly.offline import init_notebook_mode, iplot
+from plotly.graph_objs import Scatter, Layout, Figure, Heatmap
+init_notebook_mode()
+warnings.filterwarnings('ignore')
 
+sns.set_style('whitegrid')
+sns.set_context('notebook')
 
 """Database 목록"""
 
@@ -37,16 +46,30 @@ db3 = pyodbc.connect(
 db4 = pyodbc.connect(
     r'DRIVER={Oracle in OraClient11g_home1};'
     r'DBQ=oc_tqms1;'
-    r'UID=qms_view;'
+    r'UID=lqms_view;'
     r'PWD=viewdb7388;'               
     )
 
+
 """기타 정보"""
-columns = ['불량명','lot','카메라 번호', 'size(max)','size(min)','value','불량번호','x','y']
+columns = ['광학계','lot','카메라 번호', 'size(max)','size(min)','value','불량번호','x','y']
 width_list = {'W1' : 1280, 'W3' : 1400, 'W4' : 1930, 'W5' : 2200}
 
-   
-    
+"""마킹 정보"""
+defect_matching = {'2305' : 'Cross1_휘점(강)', '67841' : 'Cross1_휘점(약)', '2306' : 'Cross1_쿠닉(강)', '67842' : 'Cross1_쿠닉(약)',
+                   '2307' : 'Cross1_군집,S/C(강)', '67843' : 'Cross1_군집,S/C(약)', '257' : 'Cross2_휘점(강)', '65793' : 'Cross2_휘점(약)',
+                   '258' : 'Cross2_쿠닉(강)', '65794' : 'Cross2_쿠닉(약)', '259' : 'Cross2_군집,S/C(강)', '65795' : 'Cross2_군집,S/C(약)',
+                   '1793' : '정반사A_기포(백)(강)', '67329' : '정반사A_기포(백)(약)', '1794' : '정반사A_이물(흑)(강)', '67330' : '정반사A_이물(흑)(약)',
+                   '769' : '미분투과_이물(강)', '66305' : '미분투과_이물(약)', '770' : '미분투과_라미눌림(강)', '66306' : '미분투과_라미눌림(약)',
+                   '772' : '미분투과_S/C(강)', '66308' : '미분투과_S/C(약)', '1537' : '정반사B_기포(백)(강)', '67073' : '정반사B_기포(백)(약)',
+                   '1538' : '정반사B_이물(흑)(강)', '67074' : '정반사B_이물(흑)(약)', '1025' : '정투과_점이물(강)', '66561' : '정투과_점이물(약)',
+                   '1026' : '정투과_선이물(강)', '66562' : '정투과_선이물(약)', '1281' : '투영검사_백점(강)', '66817' : '투영검사_백점(약)',
+                   '1282' : '투영검사_흑점(강)', '66818' : '투영검사_흑점(약)', '69782' : 'Cross1_휘점(약)(주기)', '100059' : '정투과_점이물(약)(주기)',
+                   '108752' : 'Cross1_군집,S/C(약)(주기)', '99752' : '정투과_점이물(약)(주기)', '99772' : '정투과_점이물(약)(주기)', '34216' : '정투과_점이물(강)(주기)',
+                   '34236' : '정투과_점이물(강)(주기)', '5716' : 'Cross1_쿠닉(강)(주기)', '69932' : 'Cross1_휘점(약)(주기)', '84767' : '84767',
+                   '84772' : '84772', '84837' : '84837', '84732' : '84732' }
+
+
 class output():
     """
     데이터를 처리해서 특정 원하는 결과 값을 가져올 때 사용한다. 
@@ -76,7 +99,7 @@ class output():
         """
         X = data.copy()
         if drop:
-            X = data.drop(['불량명','lot','카메라 번호','value','불량번호','size'], axis = 1)
+            X = data.drop(['광학계','lot','카메라 번호','value','불량번호','size'], axis = 1)
         X1, X2, X3, X4 = X.copy(), X.copy(), X.copy(), X.copy()
         X1['x'], X1['y'] = X1['x'] + x_mark, X1['y'] + y_mark 
         X2['x'], X2['y'] = X2['x'] + x_mark, X2['y'] - y_mark
@@ -151,11 +174,11 @@ class preprocessing():
         Parameters
         ----------
         data : 입력 데이터(dataframe)        
-        *args : 데이터 불량 번호(int), 순차적으로 입력
+        *args : 데이터 불량 번호(str), 순차적으로 입력
         
         Returns
         -------
-        data : 수정된 데이터 (dataframe)
+        X : 수정된 데이터 (dataframe)
 
         """
         X = data.copy()
@@ -192,11 +215,215 @@ class preprocessing():
 
         return slit1, slit2
         
+
+        
+class plot():     
+    """
+    그래프 그릴 때 사용한다.
+    """
     
-              
+    def scatter(lot, data1, width, length, figsize = (8, 6), data2 = None):
+        """
+        scatter plot, 자동검사기 맵 출력
+        
+        Parameter
+        ---------
+        lot : lot(str)
+        data1 : 입력 데이터(dataframe)/'강' 불량 입력
+        width : 폭(int)
+        length : 길이(int)
+        figsize : 그래프 크기
+        data2 : 입력 데이터(dataframe)/'약' 불량 입력
+        
+        Return
+        ------
+        fig : 그래프 
+        
+        """
+        fig, ax = plt.subplots(1,1, figsize = figsize)
+        ax.scatter(data1['x'], data1['y'], s = 10, c = 'r', linewidth = 0)
+        
+        if data2:
+            ax.scatter(data2['x'], data2['y'], s = 10, c = 'b', linewidth = 0)
+    
+        ax.set_xlim(0, width) 
+        ax.set_ylim(0, length) 
+        ax.set_xticks([i for i in range(0, width, 100)])  
+        ax.set_yticks([i for i in range(0, length, 100)]) 
+        ax.tick_params(axis = 'both', which = 'both', length = 0) 
+        ax.grid(linewidth = 0.3)
+        ax.set_title(lot)
+            
+        return fig
+        
+        
+        
+    def heatmap(lot, data, bins_size, bins_value, labels_size, labels_value, figsize = (12,8)):    
+        """
+        heatmap plot, 자동검사기 조건 별 마킹 개수 출력
+        
+        Parameter
+        ---------
+        lot : lot(str)
+        data : 입력 데이터(dataframe)
+        bins_size : size 나눌 값(list)
+        bins_value : value 나눌 값(list)
+        labels_size : size 나눌 label(list)
+        labels_value : value 나눌 label(list)
+        figsize : 그래프 크기
+        
+        Return
+        ------
+        fig : 그래프
+        
+        """
+        
+        X = data.copy()
+        X['cut_size'] = pd.cut(X['size'], bins_size, labels = labels_size)
+        X['cut_value'] = pd.cut(X['value'], bins_value, labels = labels_value)
+        X = X.groupby(by = ['cut_size','cut_value']).size().unstack()
+        fig, ax = plt.subplots(1,1, figsize = figsize)
+        x = sns.heatmap(X, annot = True, fmt = '2g', ax = ax)
+        x.invert_yaxis()
+        ax.set_title(lot)
+
+    
+        return fig
+                
+    
+class i_plot():
+    """
+    Interactive 그래프 그릴 때 사용한다.
+    """
+    
+    def scatter(lot, data, width, length, criteria = '광학계'):
+        """
+        Interactive plot, 자동검사기 맵 출력
+        
+        Parameters
+        ----------
+        lot : lot(str)
+        data : 입력 데이터(dataframe)
+        width : 폭(int)
+        length : 길이(int)
+        criteria : 광학계/불량번호(str)
+        
+        Returns
+        -------
+        Jupyter 내 그래프 출력        
+        
+        """
+        
+        graph = []
+        defect_list = [i for i in data[criteria].drop_duplicates()]
+        for i in defect_list:            
+            trace = Scatter(
+                        x = data[data[criteria] == i]['x'],        
+                        y = data[data[criteria] == i]['y'],     
+                        mode = 'markers',
+                        hoverinfo = 'text',
+                        name = i,
+                        text = [i + '<br>size:%.2f<br>value:%.f'%(j,k) for j,k in zip(data['size'],data['value'])],
+                        marker = dict(
+                            size = 5
+                            )
+                        )
+            graph.append(trace)
+        
+        layout = Layout(
+                    title = lot,
+                    height = 900,
+                    width = 1000,
+                    hovermode = 'closest',
+                    xaxis = dict(
+                        title = 'X',
+                        mirror = 'ticks',
+                        showline = True,
+                        tick0 = 0,
+                        dtick = 100,
+                        autotick = False,
+                        showgrid = False,
+                        range = [0,width]
+                        ),
+                    yaxis = dict(
+                        title = 'Y',
+                        mirror = 'ticks',
+                        showline = True,
+                        tick0 = 0,
+                        dtick = 100,
+                        autotick = False,
+                        showgrid = True,
+                        range = [0,length]
+                        ),
+                    margin = dict(
+                        l=50,
+                        r=30,
+                        b=30,
+                        t=160,                
+                        )
+                    )
+        fig = Figure(data=graph, layout = layout)
+        iplot(fig)
+                
+    def heatmap(lot, data, bins_size, bins_value, labels_size, labels_value):
+        """
+        Interactive plot, 자동검사기 맵 출력
+	
+        Parameter
+        ---------
+        lot : lot(str)
+        data : 입력 데이터(dataframe)
+        bins_size : size 나눌 값(list)
+        bins_value : value 나눌 값(list)
+        labels_size : size 나눌 label(list)
+        labels_value : value 나눌 label(list)
+
+        Return
+        ------
+        fig : 그래프
+        
+        """
+
+        X = data.copy()
+        X['cut_size'] = pd.cut(X['size'], bins_size, labels = labels_size)
+        X['cut_value'] = pd.cut(X['value'], bins_value, labels = labels_value)
+        X = X.groupby(by = ['cut_size','cut_value']).size().unstack()
+        
+        trace = Heatmap(
+                z=[X.iloc[i] for i in range(len(X.index))],
+                x=X.columns,
+                y=X.index,
+                colorscale='Viridis',
+               )
+        layout = Layout(
+                title = lot,
+                height = 700,
+                width = 1000,
+                hovermode = 'closest',
+                xaxis = dict(
+                    title = 'value',
+                    mirror = 'ticks',
+                    showline = False,
+                    ),
+                yaxis = dict(               
+                    mirror = 'ticks',
+                    showline = False,
+                    side = 'left',
+                    ),                
+                margin = dict(
+                    l=80,
+                    r=150,
+                    b=50,
+                    t=160,                
+                    )
+                )
+        fig = Figure(data = [trace], layout = layout)
+        iplot(fig)
+        
+        
 def read_data(lot):   
     """
-    데이터 불러오기 
+    데이터 불러오기(DAS)
     
     Parameters
     ----------
@@ -212,10 +439,30 @@ def read_data(lot):
     data['size'] = (data['size(max)'] + data['size(min)'])/2
     data['y'] /= 1000
     data.drop(['size(max)','size(min)'], axis = 1, inplace = True)
-    
+#==============================================================================
+#     data['불량명'] = data['불량번호'].apply(lambda x: defect_matching[x])
+#==============================================================================
+
     return data      
     
     
+    
+def read_excel(file_path):
+    """
+    데이터 불러오기(txt,csv)
+    
+    Parmaters
+    ---------
+    file_path : 파일 경로
+    
+    Returns
+    -------
+    data : 파일의 코팅 raw-data
+        
+    """
+    '업데이트 예정'
+    
+  
     
 def read_lot_info(lot):
     """
@@ -230,11 +477,13 @@ def read_lot_info(lot):
     width, length : 폭, 길이(tuple)
     
     """
-    width = width_list[pd.read_sql_query(qs.find_width(lot), db2).iloc[0][0][:2]]
-    length = pd.read_sql_query(qs.find_length(lot), db2).iloc[0][0]
+    width = int(width_list[pd.read_sql_query(qs.find_width(lot), db2).iloc[0][0][:2]])
+    length = int(pd.read_sql_query(qs.find_length(lot), db2).iloc[0][0])
 
     return width, length
 
+    
+    
 def chip_qty(width, length, inch_x, inch_y, axis, pitch = None):
     """
     원단을 chip으로 잘랐을 때 chip 개수
@@ -265,6 +514,7 @@ def chip_qty(width, length, inch_x, inch_y, axis, pitch = None):
     
     return chip_qty
     
+    
 
 def division(data, width, length, inch_x, inch_y, axis, pitch = None):
     """
@@ -282,7 +532,7 @@ def division(data, width, length, inch_x, inch_y, axis, pitch = None):
 
     Returns
     -------
-    data, total_qty : 수정된 데이터, 총 chip 수량(tuple)
+    X, total_qty : 수정된 데이터, 총 chip 수량(tuple)
     
     """
     
@@ -303,4 +553,3 @@ def division(data, width, length, inch_x, inch_y, axis, pitch = None):
     chip_qty = len(labels_x) * len(labels_y)
     
     return X, chip_qty
-  
