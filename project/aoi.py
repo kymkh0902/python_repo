@@ -55,8 +55,20 @@ db4 = pyodbc.connect(
 columns = ['광학계','lot','카메라 번호', 'size(max)','size(min)','value','불량번호','x','y']
 width_list = {'W1' : 1280, 'W3' : 1400, 'W4' : 1930, 'W5' : 2200}
 
-   
-    
+"""마킹 정보"""
+defect_matching = {'2305' : 'Cross1_휘점(강)', '67841' : 'Cross1_휘점(약)', '2306' : 'Cross1_쿠닉(강)', '67842' : 'Cross1_쿠닉(약)',
+                   '2307' : 'Cross1_군집,S/C(강)', '67843' : 'Cross1_군집,S/C(약)', '257' : 'Cross2_휘점(강)', '65793' : 'Cross2_휘점(약)',
+                   '258' : 'Cross2_쿠닉(강)', '65794' : 'Cross2_쿠닉(약)', '259' : 'Cross2_군집,S/C(강)', '65795' : 'Cross2_군집,S/C(약)',
+                   '1793' : '정반사A_기포(백)(강)', '67329' : '정반사A_기포(백)(약)', '1794' : '정반사A_이물(흑)(강)', '67330' : '정반사A_이물(흑)(약)',
+                   '769' : '미분투과_이물(강)', '66305' : '미분투과_이물(약)', '770' : '미분투과_라미눌림(강)', '66306' : '미분투과_라미눌림(약)',
+                   '772' : '미분투과_S/C(강)', '66308' : '미분투과_S/C(약)', '1537' : '정반사B_기포(백)(강)', '67073' : '정반사B_기포(백)(약)',
+                   '1538' : '정반사B_이물(흑)(강)', '67074' : '정반사B_이물(흑)(약)', '1025' : '정투과_점이물(강)', '66561' : '정투과_점이물(약)',
+                   '1026' : '정투과_선이물(강)', '66562' : '정투과_선이물(약)', '1281' : '투영검사_백점(강)', '66817' : '투영검사_백점(약)',
+                   '1282' : '투영검사_흑점(강)', '66818' : '투영검사_흑점(약)', '69782' : 'Cross1_휘점(약)(주기)', '100059' : '정투과_점이물(약)(주기)',
+                   '108752' : 'Cross1_군집,S/C(약)(주기)', '99752' : '정투과_점이물(약)(주기)', '99772' : '정투과_점이물(약)(주기)', '34216' : '정투과_점이물(강)(주기)',
+                   '34236' : '정투과_점이물(강)(주기)', '5716' : 'Cross1_쿠닉(강)(주기)', '69932' : 'Cross1_휘점(약)(주기)' }
+
+
 class output():
     """
     데이터를 처리해서 특정 원하는 결과 값을 가져올 때 사용한다. 
@@ -86,7 +98,7 @@ class output():
         """
         X = data.copy()
         if drop:
-            X = data.drop(['광학계','lot','카메라 번호','value','불량번호','size'], axis = 1)
+            X = data.drop(['광학계','lot','카메라 번호','value','불량번호','size','불량명'], axis = 1)
         X1, X2, X3, X4 = X.copy(), X.copy(), X.copy(), X.copy()
         X1['x'], X1['y'] = X1['x'] + x_mark, X1['y'] + y_mark 
         X2['x'], X2['y'] = X2['x'] + x_mark, X2['y'] - y_mark
@@ -145,7 +157,7 @@ class output():
         """
         X = data.copy()
         X = division(X, width, length, inch_x, inch_y, axis, pitch)[0]
-        marking_info = X.groupby(['cut_x','cut_y','불량번호','size','value'])['x'].count().unstack(2)
+        marking_info = X.groupby(['cut_x','cut_y','불량명','size','value'])['x'].count().unstack(2)
         return marking_info
         
         
@@ -426,7 +438,8 @@ def read_data(lot):
     data['size'] = (data['size(max)'] + data['size(min)'])/2
     data['y'] /= 1000
     data.drop(['size(max)','size(min)'], axis = 1, inplace = True)
-    
+    data['불량명'] = data['불량번호'].apply(lambda x: defect_matching[x])
+
     return data      
     
     
