@@ -66,7 +66,8 @@ defect_matching = {'2305' : 'Cross1_휘점(강)', '67841' : 'Cross1_휘점(약)'
                    '1026' : '정투과_선이물(강)', '66562' : '정투과_선이물(약)', '1281' : '투영검사_백점(강)', '66817' : '투영검사_백점(약)',
                    '1282' : '투영검사_흑점(강)', '66818' : '투영검사_흑점(약)', '69782' : 'Cross1_휘점(약)(주기)', '100059' : '정투과_점이물(약)(주기)',
                    '108752' : 'Cross1_군집,S/C(약)(주기)', '99752' : '정투과_점이물(약)(주기)', '99772' : '정투과_점이물(약)(주기)', '34216' : '정투과_점이물(강)(주기)',
-                   '34236' : '정투과_점이물(강)(주기)', '5716' : 'Cross1_쿠닉(강)(주기)', '69932' : 'Cross1_휘점(약)(주기)' }
+                   '34236' : '정투과_점이물(강)(주기)', '5716' : 'Cross1_쿠닉(강)(주기)', '69932' : 'Cross1_휘점(약)(주기)', '84767' : '84767',
+                   '84772' : '84772', '84837' : '84837', '84732' : '84732' }
 
 
 class output():
@@ -98,7 +99,7 @@ class output():
         """
         X = data.copy()
         if drop:
-            X = data.drop(['광학계','lot','카메라 번호','value','불량번호','size','불량명'], axis = 1)
+            X = data.drop(['광학계','lot','카메라 번호','value','불량번호','size'], axis = 1)
         X1, X2, X3, X4 = X.copy(), X.copy(), X.copy(), X.copy()
         X1['x'], X1['y'] = X1['x'] + x_mark, X1['y'] + y_mark 
         X2['x'], X2['y'] = X2['x'] + x_mark, X2['y'] - y_mark
@@ -157,7 +158,7 @@ class output():
         """
         X = data.copy()
         X = division(X, width, length, inch_x, inch_y, axis, pitch)[0]
-        marking_info = X.groupby(['cut_x','cut_y','불량명','size','value'])['x'].count().unstack(2)
+        marking_info = X.groupby(['cut_x','cut_y','불량번호','size','value'])['x'].count().unstack(2)
         return marking_info
         
         
@@ -365,10 +366,10 @@ class i_plot():
         iplot(fig)
                 
     def heatmap(lot, data, bins_size, bins_value, labels_size, labels_value):
-	"""
+        """
         Interactive plot, 자동검사기 맵 출력
 	
-	Parameter
+        Parameter
         ---------
         lot : lot(str)
         data : 입력 데이터(dataframe)
@@ -438,7 +439,9 @@ def read_data(lot):
     data['size'] = (data['size(max)'] + data['size(min)'])/2
     data['y'] /= 1000
     data.drop(['size(max)','size(min)'], axis = 1, inplace = True)
-    data['불량명'] = data['불량번호'].apply(lambda x: defect_matching[x])
+#==============================================================================
+#     data['불량명'] = data['불량번호'].apply(lambda x: defect_matching[x])
+#==============================================================================
 
     return data      
     
