@@ -10,10 +10,11 @@ import pyodbc
 import query_state as qs
 import matplotlib.pyplot as plt
 import seaborn as sns
+import warnings
 from plotly.offline import init_notebook_mode, iplot
-from plotly.graph_objs import Scatter, Layout, Figure
+from plotly.graph_objs import Scatter, Layout, Figure, Heatmap
 init_notebook_mode()
-
+warnings.filterwarnings('ignore')
 
 sns.set_style('whitegrid')
 sns.set_context('notebook')
@@ -85,7 +86,7 @@ class output():
         """
         X = data.copy()
         if drop:
-            X = data.drop(['불량명','lot','카메라 번호','value','불량번호','size'], axis = 1)
+            X = data.drop(['광학계','lot','카메라 번호','value','불량번호','size'], axis = 1)
         X1, X2, X3, X4 = X.copy(), X.copy(), X.copy(), X.copy()
         X1['x'], X1['y'] = X1['x'] + x_mark, X1['y'] + y_mark 
         X2['x'], X2['y'] = X2['x'] + x_mark, X2['y'] - y_mark
@@ -208,12 +209,13 @@ class plot():
     그래프 그릴 때 사용한다.
     """
     
-    def scatter(lot, data1, width, length, figsize = (12, 8), data2 = None):
+    def scatter(lot, data1, width, length, figsize = (8, 6), data2 = None):
         """
         scatter plot, 자동검사기 맵 출력
         
         Parameter
         ---------
+        lot : lot(str)
         data1 : 입력 데이터(dataframe)/'강' 불량 입력
         width : 폭(int)
         length : 길이(int)
@@ -231,25 +233,25 @@ class plot():
         if data2:
             ax.scatter(data2['x'], data2['y'], s = 10, c = 'b', linewidth = 0)
     
-        ax.set_xlim(0,data1['x'].max()) 
-        ax.set_ylim(0,data1['y'].max()) 
-        ax.set_xticks([i for i in range(0, width, 100)]+[width])  
-        ax.set_yticks([i for i in range(0, length, 100)]+[length]) 
+        ax.set_xlim(0, width) 
+        ax.set_ylim(0, length) 
+        ax.set_xticks([i for i in range(0, width, 100)])  
+        ax.set_yticks([i for i in range(0, length, 100)]) 
         ax.tick_params(axis = 'both', which = 'both', length = 0) 
-        ax.spines['top'].set_visible(False) 
-        ax.grid('off')
-        ax.title(lot)
+        ax.grid(linewidth = 0.3)
+        ax.set_title(lot)
             
         return fig
         
         
         
-    def heatmap(data, bins_size, bins_value, labels_size, labels_value, figsize = (12,8)):    
+    def heatmap(lot, data, bins_size, bins_value, labels_size, labels_value, figsize = (12,8)):    
         """
         heatmap plot, 자동검사기 조건 별 마킹 개수 출력
         
         Parameter
         ---------
+        lot : lot(str)
         data : 입력 데이터(dataframe)
         bins_size : size 나눌 값(list)
         bins_value : value 나눌 값(list)
@@ -262,15 +264,16 @@ class plot():
         fig : 그래프
         
         """
+        
         X = data.copy()
         X['cut_size'] = pd.cut(X['size'], bins_size, labels = labels_size)
         X['cut_value'] = pd.cut(X['value'], bins_value, labels = labels_value)
-        X = X.groupby(by = ['cut_size','cut_value']).size().reset_index(name = 'quantity')
-        X = X.pivot('cut_size','cut_value','quantity')
-        
+        X = X.groupby(by = ['cut_size','cut_value']).size().unstack()
         fig, ax = plt.subplots(1,1, figsize = figsize)
-        x = sns.heatmap(X, annot = True, fmt = '2g')
-        x.invert_yaxis()  
+        x = sns.heatmap(X, annot = True, fmt = '2g', ax = ax)
+        x.invert_yaxis()
+        ax.set_title(lot)
+
     
         return fig
                 
@@ -349,7 +352,61 @@ class i_plot():
         fig = Figure(data=graph, layout = layout)
         iplot(fig)
                 
-              
+    def heatmap(lot, data, bins_size, bins_value, labels_size, labels_value):
+	"""
+        Interactive plot, 자동검사기 맵 출력
+	
+	Parameter
+        ---------
+        lot : lot(str)
+        data : 입력 데이터(dataframe)
+        bins_size : size 나눌 값(list)
+        bins_value : value 나눌 값(list)
+        labels_size : size 나눌 label(list)
+        labels_value : value 나눌 label(list)
+
+        Return
+        ------
+        fig : 그래프
+        
+        """
+
+        X = data.copy()
+        X['cut_size'] = pd.cut(X['size'], bins_size, labels = labels_size)
+        X['cut_value'] = pd.cut(X['value'], bins_value, labels = labels_value)
+        X = X.groupby(by = ['cut_size','cut_value']).size().unstack()
+        
+        trace = Heatmap(
+                z=[X.iloc[i] for i in range(len(X.index))],
+                x=X.columns,
+                y=X.index,
+                colorscale='Viridis',
+               )
+        layout = Layout(
+                title = lot,
+                height = 700,
+                width = 1000,
+                hovermode = 'closest',
+                xaxis = dict(
+                    title = 'value',
+                    mirror = 'ticks',
+                    showline = False,
+                    ),
+                yaxis = dict(               
+                    mirror = 'ticks',
+                    showline = False,
+                    side = 'left',
+                    ),                
+                margin = dict(
+                    l=80,
+                    r=150,
+                    b=50,
+                    t=160,                
+                    )
+                )
+        fig = Figure(data = [trace], layout = layout)
+        iplot(fig)
+        
         
 def read_data(lot):   
     """
