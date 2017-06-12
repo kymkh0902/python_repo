@@ -158,7 +158,7 @@ class output():
         """
         X = data.copy()
         X = division(X, width, length, inch_x, inch_y, axis, pitch)[0]
-        marking_info = X.groupby(['cut_x','cut_y','불량번호','size','value'])['x'].count().unstack(2)
+        marking_info = X.groupby(['cut_x','cut_y','불량명','size','value','x','y'])['x'].count().unstack(2)
         return marking_info
         
         
@@ -188,7 +188,7 @@ class preprocessing():
         return X
     
         
-    def slitting(data, width, reverse = False):
+    def slitting(data, width):
         """
         slitting 했을 시 데이터 분할
         
@@ -196,22 +196,16 @@ class preprocessing():
         ---------
         data : 입력 데이터(dataframe)
         width : 폭(int)
-        reverse : False(현 데이터 방향 그대로), True(반대)
         
         Returns
         -------
         slit1, slit2 : 분할된 데이터 2개 값 출력 (tuple)
         
         """
-        if reverse:
-            slit1 = data[data['x'] >= width]
-            slit2 = data[data['x'] < width]
-            slit1['x'] = slit1['x'] - width
-
-        else:            
-            slit1 = data[data['x'] < width]
-            slit2 = data[data['x'] >= width]
-            slit2['x'] = slit2['x'] - width
+           
+        slit1 = data[data['x'] < width]
+        slit2 = data[data['x'] >= width]
+        slit2['x'] = slit2['x'] - width
 
         return slit1, slit2
         
@@ -325,7 +319,7 @@ class i_plot():
                         name = i,
                         text = [i + '<br>size:%.2f<br>value:%.f'%(j,k) for j,k in zip(data['size'],data['value'])],
                         marker = dict(
-                            size = 5
+                            size = 5,
                             )
                         )
             graph.append(trace)
@@ -421,27 +415,34 @@ class i_plot():
         iplot(fig)
         
         
-def read_data(lot):   
+def read_data(lot, rotate = True):   
     """
     데이터 불러오기(DAS)
     
     Parameters
     ----------
     lot : 입력 lot(str)
-    
+    rotate : 이 후 공정에 따른 시작/끝 점 변화, OS/DS 변화
+    --> x도 반대, y도 반대 맞나요?
+        
     Returns
     -------
     data : 해당 lot의 코팅 raw-data 
     
     """
+    
     data = pd.read_sql_query(qs.find_das(lot), db1)
     data.columns = columns 
     data['size'] = (data['size(max)'] + data['size(min)'])/2
     data['y'] /= 1000
     data.drop(['size(max)','size(min)'], axis = 1, inplace = True)
-#==============================================================================
-#     data['불량명'] = data['불량번호'].apply(lambda x: defect_matching[x])
-#==============================================================================
+    data['불량명'] = data['불량번호'].apply(lambda x: defect_matching[x] if x in defect_matching.keys() else x)
+    if rotate:
+        after_coating_info = pd.read_sql_query(qs.after_coating(lot), db3)
+        if len(after_coating_info)%2 != 0:            
+            width, length = read_lot_info(lot)
+            data['x'] = width - data['x']
+            data['y'] = length - data['y']
 
     return data      
     
@@ -477,8 +478,13 @@ def read_lot_info(lot):
     width, length : 폭, 길이(tuple)
     
     """
-    width = int(width_list[pd.read_sql_query(qs.find_width(lot), db2).iloc[0][0][:2]])
-    length = int(pd.read_sql_query(qs.find_length(lot), db2).iloc[0][0])
+    if lot[9] == 'C':  #코팅lot
+        width = int(width_list[pd.read_sql_query(qs.find_width(lot), db2).iloc[0][0][:2]])
+        length = int(pd.read_sql_query(qs.find_length(lot), db2).iloc[0][0])
+
+    elif lot[9] == 'D': #슬리팅lot
+        width = int(pd.read_sql_query(qs.find_width('20170517DD03047'), db2).iloc[0].str.extract('[(](\d*)[)]')[0])
+        length = int(pd.read_sql_query(qs.find_length(lot), db2).iloc[0][0])
 
     return width, length
 
