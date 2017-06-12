@@ -290,17 +290,21 @@ class i_plot():
     Interactive 그래프 그릴 때 사용한다.
     """
     
-    def scatter(lot, data, width, length, criteria = '광학계'):
+    def scatter(coating_lot, data, width, length, criteria = '광학계', slitting_width = None, slitting_lot1 = None, slitting_lot2 = None):
         """
         Interactive plot, 자동검사기 맵 출력
         
         Parameters
         ----------
-        lot : lot(str)
+        coating_lot : 코팅lot(str)
         data : 입력 데이터(dataframe)
         width : 폭(int)
         length : 길이(int)
         criteria : 광학계/불량번호(str)
+        slitting_width : 슬리팅 폭(int)
+        slitting_lot1 : 슬리팅 첫번째 lot(str)
+        slitting_lot2 : 슬리팅 두번째 lot(str)
+        slitting_line : 슬리팅 기준선(int)
         
         Returns
         -------
@@ -323,9 +327,42 @@ class i_plot():
                             )
                         )
             graph.append(trace)
-        
-        layout = Layout(
-                    title = lot,
+            
+        if slitting_width:
+            annotations = [dict(
+                        x=slitting_width/2,
+                        y=length/2,
+                        xref='x',
+                        yref='y',
+                        text=slitting_lot1,
+                        showarrow=False,                        
+                        ),
+                        dict(
+                        x=slitting_width+(width-slitting_width)/2,
+                        y=length/2,
+                        xref='x',
+                        yref='y',
+                        text= slitting_lot2,
+                        showarrow=False,                        
+                        )
+                        ]
+            shapes = [
+                        {
+                        'type':'line',
+                        'x0':slitting_width,
+                        'y0':0,
+                        'x1':slitting_width,
+                        'y1':length,      
+                        'line': {
+                                'color': 'black',
+                                'width': 1,
+                                'dash': 'dot',
+                            },
+                        }
+                    ]            
+
+            layout = Layout(
+                    title = coating_lot,
                     height = 900,
                     width = 1000,
                     hovermode = 'closest',
@@ -354,8 +391,44 @@ class i_plot():
                         r=30,
                         b=30,
                         t=160,                
-                        )
+                        ),
+                    annotations = annotations,
+                    shapes = shapes
                     )
+        else:             
+            layout = Layout(
+                    title = coating_lot,
+                    height = 900,
+                    width = 1000,
+                    hovermode = 'closest',
+                    xaxis = dict(
+                        title = 'X',
+                        mirror = 'ticks',
+                        showline = True,
+                        tick0 = 0,
+                        dtick = 100,
+                        autotick = False,
+                        showgrid = False,
+                        range = [0,width]
+                        ),
+                    yaxis = dict(
+                        title = 'Y',
+                        mirror = 'ticks',
+                        showline = True,
+                        tick0 = 0,
+                        dtick = 100,
+                        autotick = False,
+                        showgrid = True,
+                        range = [0,length]
+                        ),
+                    margin = dict(
+                        l=50,
+                        r=30,
+                        b=30,
+                        t=160,                
+                        ),
+                    )
+            
         fig = Figure(data=graph, layout = layout)
         iplot(fig)
                 
@@ -465,21 +538,29 @@ def read_excel(file_path):
     
   
     
-def read_lot_info(lot):
+def read_lot_info(lot, test_width = None):
     """
     lot 정보 불러오기(width, length)
     
     Parameters
     ----------
     lot : 입력 lot(str)
+    width : TEST 제품의 경우 수동 입력(int)
     
     Returns
     -------
     width, length : 폭, 길이(tuple)
     
     """
-    if lot[9] == 'C':  #코팅lot
-        width = int(width_list[pd.read_sql_query(qs.find_width(lot), db2).iloc[0][0][:2]])
+    if lot[9] in ['E', 'C']:  #코팅lot
+        width = pd.read_sql_query(qs.find_width(lot), db2).iloc[0][0][:2]
+        try:
+            width = int(width_list[width])                        
+        except:
+            if test_width != None:
+                width = test_width 
+            else:
+                raise Exception('TEST 제품입니다. 폭을 입력해주세요')
         length = int(pd.read_sql_query(qs.find_length(lot), db2).iloc[0][0])
 
     elif lot[9] == 'D': #슬리팅lot
