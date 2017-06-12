@@ -1566,7 +1566,32 @@ def lottrace2(lot):
     AND NOT SUBSTR(prod_cd, 3, 3) in ('APF')                      
     '''.format(lot[:8], lot[8:12], lot[12::]))
 
+  
+#%%
+def after_coating(lot):
+    return(
+   '''
+    SELECT unique_lot_no FROM
 
+	(SELECT DISTINCT unique_lot_no, prod_cd, prod_wc_cd, norm_qty FROM
+
+		(SELECT unique_lot_no, prod_date, prod_wc_cd, prod_seq_no, o_global_create_no, i_global_create_no, prod_cd, normal_qty + normal_corr_qty norm_qty FROM tb_iem120,
+
+           (SELECT o_global_create_no, i_global_create_no FROM tb_iem131 a, tb_iem120 b WHERE a.i_global_create_no = b.global_create_no AND a.del_flag = 'A' AND b.prod_wc_cd LIKE '%%')
+
+		WHERE i_global_create_no = global_create_no)
+
+    START WITH prod_date = '{}' AND prod_wc_cd = '{}' AND prod_seq_no = '{}'
+
+    CONNECT BY PRIOR o_global_create_no = i_global_create_no)
+
+    WHERE SUBSTR(prod_wc_cd, 2, 1) in ('C', 'L')
+
+    AND NOT SUBSTR(prod_cd, 3, 3) in ('APF')                     
+    '''.format(lot[:8], lot[8:12], lot[12::]))
+  
+  
+  
 
 #연태 검사실적
 def yt_inspection(start_date, end_date):
