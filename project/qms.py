@@ -8,29 +8,9 @@ import pandas as pd
 import query_state as qs
 import pyodbc
 
-db1 = pyodbc.connect(
-    r'DRIVER={SQL Server};'
-    r'SERVER=165.244.114.87;'
-    r'DATABASE=LGCOPTMP;'
-    r'UID=sa;'
-    r'PWD=@admin123'
-    )
+"""Database ëª©ë¡"""
 
-db2 = pyodbc.connect(
-    r'DRIVER={Oracle in OraClient11g_home1};'
-    r'DBQ=iepcs;'
-    r'UID=iepcs_view;'
-    r'PWD=viewdb7388;'   
-    )
-
-db3 = pyodbc.connect(
-    r'DRIVER={Oracle in OraClient11g_home1};'
-    r'DBQ=iegosp;'
-    r'UID=iegos_view;'
-    r'PWD=viewdb7388;'               
-    )
-
-db4 = pyodbc.connect(
+db = pyodbc.connect(
     r'DRIVER={Oracle in OraClient11g_home1};'
     r'DBQ=oc_tqms1;'
     r'UID=lqms_view;'
@@ -40,55 +20,55 @@ db4 = pyodbc.connect(
 
 
 class lqms():
-    """LQMS »ç¿ë"""
+    """LQMS ì‚¬ìš©"""
     def read_data(prod_wc_cd, prod_cd, start_date, end_date, *items):
         """
-        ¹°¼º µ¥ÀÌÅÍ ºÒ·¯¿Ã ¶§ »ç¿ëÇÑ´Ù.
+        ë¬¼ì„± ë°ì´í„° ë¶ˆëŸ¬ì˜¬ ë•Œ ì‚¬ìš©í•œë‹¤.
         
         Parameters
         ----------
-        code : Á¦Ç° ÄÚµå(str)
-        start_date : ½ÃÀÛ ³¯Â¥(int|str)
-        end_date : ¸¶Áö¸· ³¯Â¥(int|str)
-        *items : ¹°¼º °ª(str) ¹Ì ÀÔ·Â ½Ã ÀüÃ¼ °ª Ãâ·Â
+        code : ì œí’ˆ ì½”ë“œ(str)
+        start_date : ì‹œì‘ ë‚ ì§œ(int|str)
+        end_date : ë§ˆì§€ë§‰ ë‚ ì§œ(int|str)
+        *items : ë¬¼ì„± ê°’(str) ë¯¸ ì…ë ¥ ì‹œ ì „ì²´ ê°’ ì¶œë ¥
         
         Returns
         -------
-        X : µ¥ÀÌÅÍ(dataframe)
+        X : ë°ì´í„°(dataframe)
         
         """
         
-        X = pd.read_sql_query(qs.lqms_data(prod_wc_cd, prod_cd, start_date, end_date, *items), db4)        
-        X.columns = ['lot','Á¦Ç°ÄÚµå','¹°¼º','´ÜÀ§','n¼ö','ÃøÁ¤°ª','USL','LSL','ÆÇÁ¤']
-        X[['ÃøÁ¤°ª','USL','LSL']] = X[['ÃøÁ¤°ª','USL','LSL']].astype(float)
+        X = pd.read_sql_query(qs.lqms_data(prod_wc_cd, prod_cd, start_date, end_date, *items), db)        
+        X.columns = ['lot','ì œí’ˆì½”ë“œ','ë¬¼ì„±','ë‹¨ìœ„','nìˆ˜','ì¸¡ì •ê°’','USL','LSL','íŒì •']
+        X[['ì¸¡ì •ê°’','USL','LSL']] = X[['ì¸¡ì •ê°’','USL','LSL']].astype(float)
         return X
         
         
 def Cpk(data,d2=1.693):
     """
-    Cpk ±¸ÇÒ ¶§ »ç¿ëÇÑ´Ù.
+    Cpk êµ¬í•  ë•Œ ì‚¬ìš©í•œë‹¤.
     
     Parameters
     ----------
-    data : ¹°¼º µ¥ÀÌÅÍ(dataframe)
+    data : ë¬¼ì„± ë°ì´í„°(dataframe)
     d2 : 1.693 (n = 3) / 1.128 (n = 2)
     
     Returns
     -------
-    Cpk : Cpk°ª(float)
+    Cpk : Cpkê°’(float)
     
     """
     
     usl = data['USL'].dropna().drop_duplicates()
     lsl = data['LSL'].dropna().drop_duplicates()
     if len(usl) + len(lsl) != 2:            
-        raise Exception('USL, LSLÀÌ 2°³ ÀÌ»ó ÀÖ°Å³ª ¾ø½À´Ï´Ù. ´ÜÀÏ grade, codeÀÎÁö È®ÀÎÇØº¸¼¼¿ä.')
+        raise Exception('USL, LSLì´ 2ê°œ ì´ìƒ ìˆê±°ë‚˜ ì—†ìŠµë‹ˆë‹¤. ë‹¨ì¼ grade, codeì¸ì§€ í™•ì¸í•´ë³´ì„¸ìš”.')
         
     else:
         usl, lsl = usl[0], lsl[0]
 
-    sigma = (data.groupby('lot')['ÃøÁ¤°ª'].max() - data.groupby('lot')['ÃøÁ¤°ª'].min()).mean()/d2
-    m = data['ÃøÁ¤°ª'].mean()
+    sigma = (data.groupby('lot')['ì¸¡ì •ê°’'].max() - data.groupby('lot')['ì¸¡ì •ê°’'].min()).mean()/d2
+    m = data['ì¸¡ì •ê°’'].mean()
     Cpu = float(usl - m) / (3*sigma)
     Cpl = float(m - lsl) / (3*sigma)
     Cpk = min([Cpu, Cpl])
@@ -97,35 +77,28 @@ def Cpk(data,d2=1.693):
     
 def Ppk(data):
     """
-    Ppk ±¸ÇÒ ¶§ »ç¿ëÇÑ´Ù.
+    Ppk êµ¬í•  ë•Œ ì‚¬ìš©í•œë‹¤.
     
     Paramters
     ---------
-    data : ¹°¼º µ¥ÀÌÅÍ(dataframe)
+    data : ë¬¼ì„± ë°ì´í„°(dataframe)
     
     Returns
     -------
-    Ppk : Ppk°ª(float)
+    Ppk : Ppkê°’(float)
     
     """
     
     usl = data['USL'].dropna().drop_duplicates()
     lsl = data['LSL'].dropna().drop_duplicates()
     if len(usl) + len(lsl) != 2:            
-        raise Exception('USL, LSLÀÌ 2°³ ÀÌ»ó ÀÖ°Å³ª ¾ø½À´Ï´Ù. ´ÜÀÏ grade, codeÀÎÁö È®ÀÎÇØº¸¼¼¿ä.')
+        raise Exception('USL, LSLì´ 2ê°œ ì´ìƒ ìˆê±°ë‚˜ ì—†ìŠµë‹ˆë‹¤. ë‹¨ì¼ grade, codeì¸ì§€ í™•ì¸í•´ë³´ì„¸ìš”.')
         
     else:
         usl, lsl = usl[0], lsl[0]
-    sigma = data['ÃøÁ¤°ª'].std()
-    m = data['ÃøÁ¤°ª'].mean()
+    sigma = data['ì¸¡ì •ê°’'].std()
+    m = data['ì¸¡ì •ê°’'].mean()
     Ppu = float(usl - m) / (3*sigma)
     Ppl = float(m - lsl) / (3*sigma)
     Ppk = min([Ppu, Ppl])
     return Ppk
-    
-        
-        
-
-
-
-        

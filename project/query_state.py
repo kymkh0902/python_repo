@@ -20,7 +20,7 @@ def find_length(lot):
 
 #Lot 찾기
 def find_lot(start_date, end_date, grade):
-    return("SELECT F_ONE_LOT_TRACE_T(ar_warhs_create_no, '_E%', '%%') AS 연신Lot, unique_lot_no AS 코팅Lot, normal_qty + normal_corr_qty AS prod_qty FROM tb_iem120 WHERE prod_date BETWEEN '{}' AND '{}' AND prod_cd LIKE '%{}%' AND prod_wc_cd LIKE '%_C%'".format(start_date, end_date, grade))
+    return("SELECT F_ONE_LOT_TRACE_T(ar_warhs_create_no, '_E%', '%%') AS 연신Lot, unique_lot_no AS 코팅Lot, prod_cd AS 코드, normal_qty + normal_corr_qty AS prod_qty FROM tb_iem120 WHERE prod_date BETWEEN '{}' AND '{}' AND prod_cd LIKE '%{}%' AND prod_wc_cd LIKE '%_C%'".format(start_date, end_date, grade))
     
 def find_lot1(lot):
     return("SELECT F_ONE_LOT_TRACE_T(ar_warhs_create_no, '_E%', '%%') AS 연신Lot, F_ONE_LOT_TRACE_T(ar_warhs_create_no, '_C%', '%%')  AS 코팅Lot FROM tb_iem120 WHERE unique_lot_no = '{}'".format(lot))
