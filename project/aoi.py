@@ -398,8 +398,8 @@ class i_plot():
         else:             
             layout = Layout(
                     title = coating_lot,
-                    height = 900,
-                    width = 1000,
+                    height = figsize[0],
+                    width = figsize[1],
                     hovermode = 'closest',
                     xaxis = dict(                        
                         mirror = 'ticks',

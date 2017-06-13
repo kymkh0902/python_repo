@@ -9,7 +9,7 @@ import pandas as pd
 import query_state as qs
 import pyodbc
 
-"""Database ¸ñ·Ï"""
+"""Database ëª©ë¡"""
 
 db1 = pyodbc.connect(
     r'DRIVER={SQL Server};'
@@ -44,37 +44,37 @@ db4 = pyodbc.connect(
 
 def read_lot(start_date, end_date, grade):
     """
-    Grade ±â°£ º° »ı»ê Á¤º¸ ºÒ·¯¿À±â
+    Grade ê¸°ê°„ ë³„ ìƒì‚° ì •ë³´ ë¶ˆëŸ¬ì˜¤ê¸°
     
     Parameters
     ----------
-    start_date : ½ÃÀÛ ³¯Â¥(int or str)
-    end_date : ¸¶Áö¸· ³¯Â¥(int or str)
+    start_date : ì‹œì‘ ë‚ ì§œ(int or str)
+    end_date : ë§ˆì§€ë§‰ ë‚ ì§œ(int or str)
     
     Returns
     -------
-    data : »ı»ê Á¤º¸(dataframe)
+    data : ìƒì‚° ì •ë³´(dataframe)
         
     """
         
     data = pd.read_sql_query(qs.find_lot(start_date, end_date, grade), db3)
-    data.columns = ['¿¬½Å','ÄÚÆÃ','»ı»ê·®']
+    data.columns = ['ì—°ì‹ ','ì½”íŒ…','ì½”ë“œ','ìƒì‚°ëŸ‰']
     return data
     
     
     
 def hq_inspection(start_date, end_date):
     """
-    ±â°£ º° º»»ç °Ë»ç ½ÇÀû ºÒ·¯¿À±â 
+    ê¸°ê°„ ë³„ ë³¸ì‚¬ ê²€ì‚¬ ì‹¤ì  ë¶ˆëŸ¬ì˜¤ê¸° 
     
     Parameters
     ----------
-    start_date : ½ÃÀÛ ³¯Â¥(int or str)
-    end_Date : ¸¶Áö¸· ³¯Â¥(int or str)
+    start_date : ì‹œì‘ ë‚ ì§œ(int or str)
+    end_Date : ë§ˆì§€ë§‰ ë‚ ì§œ(int or str)
     
     Returns
     -------
-    data : »ı»ê Á¤º¸(dataframe) 
+    data : ìƒì‚° ì •ë³´(dataframe) 
     
     """
     data = pd.read_sql_query(qs.hq_inspection(start_date, end_date), db3)
