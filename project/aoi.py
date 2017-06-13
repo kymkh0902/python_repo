@@ -206,7 +206,7 @@ class preprocessing():
         slit1 = data[data['x'] < width]
         slit2 = data[data['x'] >= width]
         slit2['x'] = slit2['x'] - width
-
+        
         return slit1, slit2
         
 
@@ -216,7 +216,7 @@ class plot():
     그래프 그릴 때 사용한다.
     """
     
-    def scatter(lot, data1, width, length, figsize = (8, 6), data2 = None):
+    def scatter(lot, data1, width, length, data2 = None, figsize = (8, 6)):
         """
         scatter plot, 자동검사기 맵 출력
         
@@ -226,8 +226,8 @@ class plot():
         data1 : 입력 데이터(dataframe)/'강' 불량 입력
         width : 폭(int)
         length : 길이(int)
-        figsize : 그래프 크기
         data2 : 입력 데이터(dataframe)/'약' 불량 입력
+        figsize : 그래프 크기
         
         Return
         ------
@@ -237,7 +237,7 @@ class plot():
         fig, ax = plt.subplots(1,1, figsize = figsize)
         ax.scatter(data1['x'], data1['y'], s = 10, c = 'r', linewidth = 0)
         
-        if data2:
+        if data2 is not None:
             ax.scatter(data2['x'], data2['y'], s = 10, c = 'b', linewidth = 0)
     
         ax.set_xlim(0, width) 
@@ -290,7 +290,8 @@ class i_plot():
     Interactive 그래프 그릴 때 사용한다.
     """
     
-    def scatter(coating_lot, data, width, length, criteria = '광학계', slitting_width = None, slitting_lot1 = None, slitting_lot2 = None):
+    def scatter(coating_lot, data, width, length, criteria = '광학계', slitting_width = None, 
+                slitting_lot1 = None, slitting_lot2 = None, figsize = (900, 1000)):
         """
         Interactive plot, 자동검사기 맵 출력
         
@@ -305,6 +306,7 @@ class i_plot():
         slitting_lot1 : 슬리팅 첫번째 lot(str)
         slitting_lot2 : 슬리팅 두번째 lot(str)
         slitting_line : 슬리팅 기준선(int)
+        figsize : 그래프 크기(tuple)
         
         Returns
         -------
@@ -363,11 +365,10 @@ class i_plot():
 
             layout = Layout(
                     title = coating_lot,
-                    height = 900,
-                    width = 1000,
+                    height = figsize[0],
+                    width = figsize[1],
                     hovermode = 'closest',
                     xaxis = dict(
-                        title = 'X',
                         mirror = 'ticks',
                         showline = True,
                         tick0 = 0,
@@ -377,7 +378,6 @@ class i_plot():
                         range = [0,width]
                         ),
                     yaxis = dict(
-                        title = 'Y',
                         mirror = 'ticks',
                         showline = True,
                         tick0 = 0,
@@ -389,7 +389,7 @@ class i_plot():
                     margin = dict(
                         l=50,
                         r=30,
-                        b=30,
+                        b=60,
                         t=160,                
                         ),
                     annotations = annotations,
@@ -401,8 +401,7 @@ class i_plot():
                     height = 900,
                     width = 1000,
                     hovermode = 'closest',
-                    xaxis = dict(
-                        title = 'X',
+                    xaxis = dict(                        
                         mirror = 'ticks',
                         showline = True,
                         tick0 = 0,
@@ -412,7 +411,6 @@ class i_plot():
                         range = [0,width]
                         ),
                     yaxis = dict(
-                        title = 'Y',
                         mirror = 'ticks',
                         showline = True,
                         tick0 = 0,
@@ -424,7 +422,7 @@ class i_plot():
                     margin = dict(
                         l=50,
                         r=30,
-                        b=30,
+                        b=60,
                         t=160,                
                         ),
                     )
@@ -432,7 +430,7 @@ class i_plot():
         fig = Figure(data=graph, layout = layout)
         iplot(fig)
                 
-    def heatmap(lot, data, bins_size, bins_value, labels_size, labels_value):
+    def heatmap(lot, data, bins_size, bins_value, labels_size, labels_value, figsize = (700,1000)):
         """
         Interactive plot, 자동검사기 맵 출력
 	
@@ -444,6 +442,7 @@ class i_plot():
         bins_value : value 나눌 값(list)
         labels_size : size 나눌 label(list)
         labels_value : value 나눌 label(list)
+        figsize : 그래프 크기(tuple)
 
         Return
         ------
@@ -464,8 +463,8 @@ class i_plot():
                )
         layout = Layout(
                 title = lot,
-                height = 700,
-                width = 1000,
+                height = figsize[0],
+                width = figsize[1],
                 hovermode = 'closest',
                 xaxis = dict(
                     title = 'value',
@@ -488,15 +487,16 @@ class i_plot():
         iplot(fig)
         
         
-def read_data(lot, rotate = True):   
+def read_data(lot, rotate = False, slitting = False):   
     """
     데이터 불러오기(DAS)
     
     Parameters
     ----------
     lot : 입력 lot(str)
-    rotate : 이 후 공정에 따른 시작/끝 점 변화, OS/DS 변화
-    --> x도 반대, y도 반대 맞나요?
+    rotate : 이 후 공정에 따른 x, y값 조정
+    slitting : 이 후 공정에 슬리팅 포함될 시에 y값 반대로 조정
+    
         
     Returns
     -------
@@ -515,6 +515,8 @@ def read_data(lot, rotate = True):
         if len(after_coating_info)%2 != 0:            
             width, length = read_lot_info(lot)
             data['x'] = width - data['x']
+            data['y'] = length - data['y']
+        if slitting:
             data['y'] = length - data['y']
 
     return data      
