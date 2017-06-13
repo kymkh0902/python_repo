@@ -8,29 +8,9 @@ import pandas as pd
 import query_state as qs
 import pyodbc
 
-db1 = pyodbc.connect(
-    r'DRIVER={SQL Server};'
-    r'SERVER=165.244.114.87;'
-    r'DATABASE=LGCOPTMP;'
-    r'UID=sa;'
-    r'PWD=@admin123'
-    )
+"""Database 목록"""
 
-db2 = pyodbc.connect(
-    r'DRIVER={Oracle in OraClient11g_home1};'
-    r'DBQ=iepcs;'
-    r'UID=iepcs_view;'
-    r'PWD=viewdb7388;'   
-    )
-
-db3 = pyodbc.connect(
-    r'DRIVER={Oracle in OraClient11g_home1};'
-    r'DBQ=iegosp;'
-    r'UID=iegos_view;'
-    r'PWD=viewdb7388;'               
-    )
-
-db4 = pyodbc.connect(
+db = pyodbc.connect(
     r'DRIVER={Oracle in OraClient11g_home1};'
     r'DBQ=oc_tqms1;'
     r'UID=lqms_view;'
@@ -58,7 +38,7 @@ class lqms():
         
         """
         
-        X = pd.read_sql_query(qs.lqms_data(prod_wc_cd, prod_cd, start_date, end_date, *items), db4)        
+        X = pd.read_sql_query(qs.lqms_data(prod_wc_cd, prod_cd, start_date, end_date, *items), db)        
         X.columns = ['lot','제품코드','물성','단위','n수','측정값','USL','LSL','판정']
         X[['측정값','USL','LSL']] = X[['측정값','USL','LSL']].astype(float)
         return X
@@ -122,10 +102,3 @@ def Ppk(data):
     Ppl = float(m - lsl) / (3*sigma)
     Ppk = min([Ppu, Ppl])
     return Ppk
-    
-        
-        
-
-
-
-        
