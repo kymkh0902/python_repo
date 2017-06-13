@@ -516,8 +516,8 @@ def read_data(lot, rotate = False, slitting = False):
             width, length = read_lot_info(lot)
             data['x'] = width - data['x']
             data['y'] = length - data['y']
-        if slitting:
-            data['y'] = length - data['y']
+            if slitting:
+                data['y'] = length - data['y']
 
     return data      
     
