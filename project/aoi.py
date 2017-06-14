@@ -188,14 +188,14 @@ class preprocessing():
         return X
     
         
-    def slitting(data, width):
+    def slitting(data, slitting_width):
         """
         slitting 했을 시 데이터 분할
         
         Paramters 
         ---------
         data : 입력 데이터(dataframe)
-        width : 폭(int)
+        slitting_width : 폭(int)
         
         Returns
         -------
@@ -203,9 +203,9 @@ class preprocessing():
         
         """
            
-        slit1 = data[data['x'] < width]
-        slit2 = data[data['x'] >= width]
-        slit2['x'] = slit2['x'] - width
+        slit1 = data[data['x'] < slitting_width]
+        slit2 = data[data['x'] >= slitting_width]
+        slit2['x'] = slit2['x'] - slitting_width
         
         return slit1, slit2
         
