@@ -1704,3 +1704,14 @@ def lqms_data(prod_wc_cd, prod_cd, start_date, end_date, *items):
         '''.format(prod_wc_cd, prod_cd, start_date, end_date)
         )
                                                                                   
+def read_model(customer, grade, model):
+    return(
+    '''
+    SELECT customer, npi_grade as grade, part_no, up_down, model, stickiness, stickiness2, npi_mode_type as mode_type,
+    
+    npi_app_type as app_type FROM PRODUCE_RESULT_DETAIL where customer LIKE '%{}%' and npi_grade LIKE '%{}%' and model LIKE '%{}%'  
+    
+    '''.format(customer, grade, model)
+
+)
+                                                                                

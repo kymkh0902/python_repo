@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 Created on Thu Jun  8 12:16:16 2017
 
@@ -10,10 +10,17 @@ import pyodbc
 
 """Database 목록"""
 
-db = pyodbc.connect(
+db1 = pyodbc.connect(
     r'DRIVER={Oracle in OraClient11g_home1};'
     r'DBQ=oc_tqms1;'
     r'UID=lqms_view;'
+    r'PWD=viewdb7388;'               
+    )
+
+db2 = pyodbc.connect(
+    r'DRIVER={Oracle in OraClient11g_home1};'
+    r'DBQ=oc_tqms1;'
+    r'UID=dqms_view;'
     r'PWD=viewdb7388;'               
     )
 
@@ -38,8 +45,9 @@ class lqms():
         
         """
         
-        X = pd.read_sql_query(qs.lqms_data(prod_wc_cd, prod_cd, start_date, end_date, *items), db)        
+        X = pd.read_sql_query(qs.lqms_data(prod_wc_cd, prod_cd, start_date, end_date, *items), db1)        
         X.columns = ['lot','제품코드','물성','단위','n수','측정값','USL','LSL','판정']
+        X['측정값'] = X['측정값'].apply(lambda x : 1 if x in ['OK','NG'] else x)
         X[['측정값','USL','LSL']] = X[['측정값','USL','LSL']].astype(float)
         return X
         
@@ -63,11 +71,12 @@ def Cpk(data,d2=1.693):
     lsl = data['LSL'].dropna().drop_duplicates()
     if len(usl) + len(lsl) != 2:            
         raise Exception('USL, LSL이 2개 이상 있거나 없습니다. 단일 grade, code인지 확인해보세요.')
-        
     else:
-        usl, lsl = usl[0], lsl[0]
+        usl, lsl = usl.iloc[0], lsl.iloc[0]
 
     sigma = (data.groupby('lot')['측정값'].max() - data.groupby('lot')['측정값'].min()).mean()/d2
+    if sigma == 0: 
+        raise Exception('Sigma 값이 0입니다. 측정값 내 편차가 없어서 Cpk 산출이 불가합니다.')
     m = data['측정값'].mean()
     Cpu = float(usl - m) / (3*sigma)
     Cpl = float(m - lsl) / (3*sigma)
@@ -102,3 +111,27 @@ def Ppk(data):
     Ppl = float(m - lsl) / (3*sigma)
     Ppk = min([Ppu, Ppl])
     return Ppk
+
+    
+class dqms():
+    """DQMS 사용"""
+    def read_model(customer = 'LGD', grade = '', model = ''):
+        """
+        model 정보 불러올 때 사용한다.
+        
+        Parameters
+        ----------
+        customer : 고객사(str)
+        grade : grade(str)
+        model : 모델명(str)
+        
+        Returns
+        -------
+        X : 고객사, Grade 별 모델 정보(dataframe)
+        
+        """
+        
+        X = pd.read_sql_query(qs.read_model(customer, grade, model), db2)
+        X.columns = ['고객사','grade','part no','상/하','모델명','점착제1','점착제2','모드type','application']
+        return X
+    
