@@ -52,7 +52,6 @@ db4 = pyodbc.connect(
 
 
 """기타 정보"""
-columns = ['광학계','lot','카메라 번호', 'size(max)','size(min)','value','불량번호','x','y']
 width_list = {'W1' : 1280, 'W3' : 1400, 'W4' : 1930, 'W5' : 2200}
 
 """마킹 정보"""
@@ -75,7 +74,7 @@ class output():
     데이터를 처리해서 특정 원하는 결과 값을 가져올 때 사용한다. 
     """
    
-    def ratio(data, width, length, inch_x, inch_y, axis, pitch = None, drop = True, augment = True, x_mark = 12, y_mark = 0.012): 
+    def ratio(data, width, length, inch_x, inch_y, axis, pitch = None, augment = True, x_mark = 12, y_mark = 0.012): 
         """
         입력 데이터에 대한 수율 계산
         
@@ -98,8 +97,7 @@ class output():
                 
         """
         X = data.copy()
-        if drop:
-            X = data.drop(['광학계','lot','카메라 번호','value','불량번호','size'], axis = 1)
+        X = X[['x','y']]
         X1, X2, X3, X4 = X.copy(), X.copy(), X.copy(), X.copy()
         X1['x'], X1['y'] = X1['x'] + x_mark, X1['y'] + y_mark 
         X2['x'], X2['y'] = X2['x'] + x_mark, X2['y'] - y_mark
@@ -505,11 +503,14 @@ def read_data(lot, rotate = False, slitting = False):
     """
     
     data = pd.read_sql_query(qs.find_das(lot), db1)
-    data.columns = columns 
+    data = marking_match(data, lot)
+    data = data.rename(columns = {'REMARK':'광학계','UNIQUE_LOT_NO':'lot','CAMERA_NO':'카메라 번호','MAX_SIZE':'size(max)',
+                                  'MIN_SIZE':'size(min)','V_VLAUE':'value','DEFECT_TYPE_CODE':'불량번호','FAULT_XPOS':'x',
+                                  'FAULT_YPOS':'y','DEFECT_MARK_NAME':'불량명'})
+    
     data['size'] = (data['size(max)'] + data['size(min)'])/2
     data['y'] /= 1000
     data.drop(['size(max)','size(min)'], axis = 1, inplace = True)
-    data['불량명'] = data['불량번호'].apply(lambda x: defect_matching[x] if x in defect_matching.keys() else x)
     if rotate:
         after_coating_info = pd.read_sql_query(qs.after_coating(lot), db3)
         if len(after_coating_info)%2 != 0:            
@@ -642,3 +643,41 @@ def division(data, width, length, inch_x, inch_y, axis, pitch = None):
     chip_qty = len(labels_x) * len(labels_y)
     
     return X, chip_qty
+    
+    
+    
+def marking_match(data, lot):
+    """
+    원단 불량 정보랑 마킹 유무 정보를 매칭한다
+    
+    Parameters
+    ----------
+    
+    data : 입력 데이터(dataframe)
+    
+    Returns
+    -------
+    X : 마킹 유무 정보 포함된 데이터
+    
+    """
+    X = data.copy()
+    X['강/약'] = X['DEFECT_TYPE_CODE'].apply(lambda x: '약' if int(x)>60000 else '강')
+    defect_info1 = pd.read_sql_query(qs.defect_information1(), db1)
+    defect_info1 = defect_info1.rename(columns = {'WORK_CENTER_ID':'PROD_WC_CD', 'DEFECT_MARK_SYMBOL':'FAULT_MARK','DEFECT_MARK_STATION_NAME':'CAMERA_NO'})
+    defect_info1['CAMERA_NO'] = defect_info1['CAMERA_NO'].apply(lambda x: x[3]) 
+    
+    marking_info = pd.read_sql_query(qs.marking_information(lot), db1).iloc[:,3:].T
+    marking_info.reset_index(drop = False, inplace = True)
+    marking_info.columns = ['CODE_DATA','ON/OFF']
+
+    #불량명 데이터2
+    defect_info2 = pd.read_sql_query(qs.defect_information2(), db1)
+    
+    #마킹 데이터 최종 본
+    marking_info = pd.merge(defect_info2, marking_info, how = 'left', on = 'CODE_DATA')    
+    Y = pd.merge(X, defect_info1, how = 'left', on = ['PROD_WC_CD','FAULT_MARK','CAMERA_NO'])
+    
+    #최종 데이터
+    X = pd.merge(Y, marking_info, how = 'left', on = ['DEFECT_MARK_NAME','REMARK','강/약'])
+    
+    return X

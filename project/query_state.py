@@ -12,7 +12,7 @@ def find_width(lot):
 
 #DAS data 
 def find_das(lot):
-    return("SELECT a.REMARK , b.UNIQUE_LOT_NO , CAMERA_NO, MAX_SIZE , MIN_SIZE , V_VLAUE , DEFECT_TYPE_CODE, FAULT_XPOS, FAULT_YPOS  from LAS_DATA a, LAS_MASTER b WITH (NOLOCK)  where a.IDN = b.IDN and UNIQUE_LOT_NO = '{}'".format(lot))
+    return("SELECT a.REMARK , b.UNIQUE_LOT_NO , CAMERA_NO, MAX_SIZE , MIN_SIZE , V_VLAUE , DEFECT_TYPE_CODE, FAULT_XPOS, FAULT_YPOS, PROD_WC_CD, FAULT_MARK from LAS_DATA a, LAS_MASTER b WITH (NOLOCK)  where a.IDN = b.IDN and UNIQUE_LOT_NO = '{}'".format(lot))
     
 #생산량 찾기
 def find_length(lot):
@@ -25,6 +25,22 @@ def find_lot(start_date, end_date, grade):
 def find_lot1(lot):
     return("SELECT F_ONE_LOT_TRACE_T(ar_warhs_create_no, '_E%', '%%') AS 연신Lot, F_ONE_LOT_TRACE_T(ar_warhs_create_no, '_C%', '%%')  AS 코팅Lot FROM tb_iem120 WHERE unique_lot_no = '{}'".format(lot))
 
+#불량 정보1
+def defect_information1():
+    return("SELECT DEFECT_MARK_STATION_NAME, WORK_CENTER_ID, DEFECT_MARK_SYMBOL, DEFECT_MARK_NAME FROM QA_DEFECT_MARK")
+    
+#불량 정보2
+def defect_information2():
+    return("SELECT CODE_DATA, COMMENT_1 AS DEFECT_MARK_NAME, COMMENT_2 AS REMARK, COMMENT_3 AS '강/약' FROM MASTER_CODE WHERE CODE_CLASS = '29'")
+    
+#마킹 유무 정보
+def marking_information(lot):
+    return(
+    '''
+    SELECT * FROM QA_PARAMETER_MARKING_HIS WHERE PARAMETER_NAME = (select substring(INSPEC_STATUS, 4, 40) from dbo.LAS_MASTER where UNIQUE_LOT_NO = '{0}') 
+    and PARAMETER_DATE = substring('{0}', 1, 4)+'-'+substring('{0}', 5, 2)+'-'+substring('{0}', 7, 2) and WORK_CENTER_ID = substring('{0}', 9, 4) 
+    '''.format(lot))
+    
     
 #Lot 10자리 --> 16자리 변경
 def lotchanger(lot):

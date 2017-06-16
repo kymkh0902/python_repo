@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 Created on Fri Jun  9 16:58:08 2017
 
@@ -77,6 +77,6 @@ def hq_inspection(start_date, end_date):
     data : 생산 정보(dataframe) 
     
     """
-    data = pd.read_sql_query(qs.hq_inspection(start_date, end_date), db3)
+    data = pd.read_sql_query(qs.hq_inspection(start_date, end_date), db2)
     return data
     
