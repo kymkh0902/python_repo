@@ -27,7 +27,9 @@ def find_lot1(lot):
 
 #불량 정보1
 def defect_information1():
-    return("SELECT DEFECT_MARK_STATION_NAME, WORK_CENTER_ID, DEFECT_MARK_SYMBOL, DEFECT_MARK_NAME FROM QA_DEFECT_MARK")
+    return("SELECT A.DEFECT_MARK_NAME, A.DEFECT_MARK_SYMBOL, B.COMMENT_1 AS STATION_NAME, A.WORK_CENTER_ID FROM dbo.QA_DEFECT_MARK A\
+           WITH(NOLOCK) LEFT OUTER JOIN dbo.MASTER_CODE B WITH(NOLOCK) ON B.CODE_CLASS = '03' AND B.USE_YN=  'Y' AND B.LANGUAGE_CODE = 'KR' \
+           AND A.DEFECT_MARK_STATION_NAME = B.CODE_DATA")
     
 #불량 정보2
 def defect_information2():
@@ -37,8 +39,9 @@ def defect_information2():
 def marking_information(lot):
     return(
     '''
-    SELECT * FROM QA_PARAMETER_MARKING_HIS WHERE PARAMETER_NAME = (select substring(INSPEC_STATUS, 4, 40) from dbo.LAS_MASTER where UNIQUE_LOT_NO = '{0}') 
-    and PARAMETER_DATE = substring('{0}', 1, 4)+'-'+substring('{0}', 5, 2)+'-'+substring('{0}', 7, 2) and WORK_CENTER_ID = substring('{0}', 9, 4) 
+    SELECT TOP 1 * FROM QA_PARAMETER_MARKING_HIS WHERE PARAMETER_NAME = (SELECT substring(INSPEC_STATUS, 4, 40) FROM LAS_MASTER WHERE UNIQUE_LOT_NO = '{0}')
+    AND PARAMETER_DATE <= substring('{0}', 1, 4)+'-'+substring('{0}', 5, 2)+'-'+substring('{0}', 7, 2) and WORK_CENTER_ID = substring('{0}', 9, 4)
+    ORDER BY PARAMETER_DATE DESC
     '''.format(lot))
     
     
@@ -1601,7 +1604,7 @@ def after_coating(lot):
 
     CONNECT BY PRIOR o_global_create_no = i_global_create_no)
 
-    WHERE SUBSTR(prod_wc_cd, 2, 1) in ('C', 'L')
+    WHERE SUBSTR(prod_wc_cd, 2, 1) in ('C', 'L', 'H')
 
     AND NOT SUBSTR(prod_cd, 3, 3) in ('APF')                     
     '''.format(lot[:8], lot[8:12], lot[12::]))

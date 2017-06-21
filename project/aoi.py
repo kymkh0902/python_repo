@@ -104,7 +104,7 @@ class output():
         X3['x'], X3['y'] = X3['x'] - x_mark, X3['y'] - y_mark
         X4['x'], X4['y'] = X4['x'] - x_mark, X4['y'] + y_mark
 
-        X = pd.concat([X, X1, X2, X3, X4], axis = 0)                            
+        X = pd.concat([X1, X2, X3, X4], axis = 0)                            
         X, chip_qty = division(X, width, length, inch_x, inch_y, axis, pitch)
         defect_qty = len(X[['cut_x','cut_y']].drop_duplicates().dropna())
         defect_ratio = defect_qty/chip_qty*100
@@ -508,6 +508,7 @@ def read_data(lot, rotate = False, slitting = False):
                                   'MIN_SIZE':'size(min)','V_VLAUE':'value','DEFECT_TYPE_CODE':'불량번호','FAULT_XPOS':'x',
                                   'FAULT_YPOS':'y','DEFECT_MARK_NAME':'불량명'})
     
+    
     data['size'] = (data['size(max)'] + data['size(min)'])/2
     data['y'] /= 1000
     data.drop(['size(max)','size(min)'], axis = 1, inplace = True)
@@ -518,7 +519,9 @@ def read_data(lot, rotate = False, slitting = False):
             data['x'] = width - data['x']
             data['y'] = length - data['y']
             if slitting:
+                data['x'] = width - data['x']
                 data['y'] = length - data['y']
+       
 
     return data      
     
@@ -567,7 +570,7 @@ def read_lot_info(lot, test_width = None):
         length = int(pd.read_sql_query(qs.find_length(lot), db2).iloc[0][0])
 
     elif lot[9] == 'D': #슬리팅lot
-        width = int(pd.read_sql_query(qs.find_width('20170517DD03047'), db2).iloc[0].str.extract('[(](\d*)[)]')[0])
+        width = float(pd.read_sql_query(qs.find_width(lot), db2).iloc[0].str.extract('[(](\d+.\d*)[)]')[0])
         length = int(pd.read_sql_query(qs.find_length(lot), db2).iloc[0][0])
 
     return width, length
@@ -652,32 +655,38 @@ def marking_match(data, lot):
     
     Parameters
     ----------
-    
     data : 입력 데이터(dataframe)
     
     Returns
     -------
     X : 마킹 유무 정보 포함된 데이터
     
+    
     """
     X = data.copy()
+    X['REMARK'] = X['REMARK'].apply(lambda x: '크로스1' if x == '크로스' else x)
     X['강/약'] = X['DEFECT_TYPE_CODE'].apply(lambda x: '약' if int(x)>60000 else '강')
-    defect_info1 = pd.read_sql_query(qs.defect_information1(), db1)
-    defect_info1 = defect_info1.rename(columns = {'WORK_CENTER_ID':'PROD_WC_CD', 'DEFECT_MARK_SYMBOL':'FAULT_MARK','DEFECT_MARK_STATION_NAME':'CAMERA_NO'})
-    defect_info1['CAMERA_NO'] = defect_info1['CAMERA_NO'].apply(lambda x: x[3]) 
     
+    #불량명 데이터1
+    defect_info1 = pd.read_sql_query(qs.defect_information1(), db1)
+    defect_info1 = defect_info1.rename(columns = {'WORK_CENTER_ID':'PROD_WC_CD', 'DEFECT_MARK_SYMBOL':'FAULT_MARK','STATION_NAME':'REMARK'})
+    
+    #마킹 유무 판별
     marking_info = pd.read_sql_query(qs.marking_information(lot), db1).iloc[:,3:].T
     marking_info.reset_index(drop = False, inplace = True)
     marking_info.columns = ['CODE_DATA','ON/OFF']
-
+    
     #불량명 데이터2
     defect_info2 = pd.read_sql_query(qs.defect_information2(), db1)
-    
-    #마킹 데이터 최종 본
-    marking_info = pd.merge(defect_info2, marking_info, how = 'left', on = 'CODE_DATA')    
-    Y = pd.merge(X, defect_info1, how = 'left', on = ['PROD_WC_CD','FAULT_MARK','CAMERA_NO'])
+    matching = {'점이물':'이물(점)','선이물':'이물(선)'} # 서버 내 오 기입된 값 따로 매칭.
+    defect_info2['DEFECT_MARK_NAME'] = defect_info2['DEFECT_MARK_NAME'].apply(lambda x: matching[x] if x in matching.keys() else x)
+
+    #불량명에 따른 마킹 유무 취합
+    marking_status = pd.merge(defect_info2, marking_info, how = 'left', on = 'CODE_DATA') # 합칠 수 있을 거 같은데 JOIN문 알면   
+    Y = pd.merge(X, defect_info1, how = 'left', on = ['PROD_WC_CD','FAULT_MARK','REMARK'])
     
     #최종 데이터
-    X = pd.merge(Y, marking_info, how = 'left', on = ['DEFECT_MARK_NAME','REMARK','강/약'])
+    X = pd.merge(Y, marking_status, how = 'left', on = ['DEFECT_MARK_NAME','REMARK','강/약'])
+    X.drop('CODE_DATA', axis = 1, inplace = True)
     
     return X
