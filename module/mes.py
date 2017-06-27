@@ -11,36 +11,10 @@ import pyodbc
 
 """Database 목록"""
 
-db1 = pyodbc.connect(
-    r'DRIVER={SQL Server};'
-    r'SERVER=165.244.114.87;'
-    r'DATABASE=LGCOPTMP;'
-    r'UID=sa;'
-    r'PWD=@admin123'
-    )
 
-db2 = pyodbc.connect(
-    r'DRIVER={Oracle in OraClient11g_home1};'
-    r'DBQ=iepcs;'
-    r'UID=iepcs_view;'
-    r'PWD=viewdb7388;'   
-    )
-
-db3 = pyodbc.connect(
-    r'DRIVER={Oracle in OraClient11g_home1};'
-    r'DBQ=iegosp;'
-    r'UID=iegos_view;'
-    r'PWD=viewdb7388;'               
-    )
-
-db4 = pyodbc.connect(
-    r'DRIVER={Oracle in OraClient11g_home1};'
-    r'DBQ=oc_tqms1;'
-    r'UID=lqms_view;'
-    r'PWD=viewdb7388;'               
-    )
-
-
+db1 = 'DRIVER={Oracle in OraClient11g_home1};DBQ=iepcs;UID=iepcs_view;PWD=viewdb7388;'
+db2 = 'DRIVER={Oracle in OraClient11g_home1};DBQ=iegosp;UID=iegos_view;PWD=viewdb7388;'               
+    
 
 def read_lot(start_date, end_date, grade):
     """
@@ -56,9 +30,12 @@ def read_lot(start_date, end_date, grade):
     data : 생산 정보(dataframe)
         
     """
-        
-    data = pd.read_sql_query(qs.find_lot(start_date, end_date, grade), db3)
+    gos = pyodbc.connect(db2)   
+    data = pd.read_sql_query(qs.find_lot(start_date, end_date, grade), gos)
     data.columns = ['연신','코팅','코드','생산량']
+
+    del gos
+    
     return data
     
     
@@ -77,6 +54,10 @@ def hq_inspection(start_date, end_date):
     data : 생산 정보(dataframe) 
     
     """
-    data = pd.read_sql_query(qs.hq_inspection(start_date, end_date), db2)
+    iepcs = pyodbc.connect(db1)
+    data = pd.read_sql_query(qs.hq_inspection(start_date, end_date), iepcs)
+    
+    del iepcs
+    
     return data
     

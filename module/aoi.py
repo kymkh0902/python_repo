@@ -13,6 +13,7 @@ import seaborn as sns
 import warnings
 from plotly.offline import init_notebook_mode, iplot
 from plotly.graph_objs import Scatter, Layout, Figure, Heatmap
+
 init_notebook_mode()
 warnings.filterwarnings('ignore')
 
@@ -21,54 +22,14 @@ sns.set_context('notebook')
 
 """Database 목록"""
 
-db1 = pyodbc.connect(
-    r'DRIVER={SQL Server};'
-    r'SERVER=165.244.114.87;'
-    r'DATABASE=LGCOPTMP;'
-    r'UID=sa;'
-    r'PWD=@admin123'
-    )
-
-db2 = pyodbc.connect(
-    r'DRIVER={Oracle in OraClient11g_home1};'
-    r'DBQ=iepcs;'
-    r'UID=iepcs_view;'
-    r'PWD=viewdb7388;'   
-    )
-
-db3 = pyodbc.connect(
-    r'DRIVER={Oracle in OraClient11g_home1};'
-    r'DBQ=iegosp;'
-    r'UID=iegos_view;'
-    r'PWD=viewdb7388;'               
-    )
-
-db4 = pyodbc.connect(
-    r'DRIVER={Oracle in OraClient11g_home1};'
-    r'DBQ=oc_tqms1;'
-    r'UID=lqms_view;'
-    r'PWD=viewdb7388;'               
-    )
-
-
-"""기타 정보"""
+db1 = 'DRIVER={SQL Server};SERVER=165.244.114.87;DATABASE=LGCOPTMP;UID=sa;PWD=@admin123'      
+db2 = 'DRIVER={Oracle in OraClient11g_home1};DBQ=iepcs;UID=iepcs_view;PWD=viewdb7388;'   
+db3 = 'DRIVER={Oracle in OraClient11g_home1};DBQ=iegosp;UID=iegos_view;PWD=viewdb7388;'               
+      
+"""폭 정보"""
 width_list = {'W1' : 1280, 'W3' : 1400, 'W4' : 1930, 'W5' : 2200}
 
-"""마킹 정보"""
-defect_matching = {'2305' : 'Cross1_휘점(강)', '67841' : 'Cross1_휘점(약)', '2306' : 'Cross1_쿠닉(강)', '67842' : 'Cross1_쿠닉(약)',
-                   '2307' : 'Cross1_군집,S/C(강)', '67843' : 'Cross1_군집,S/C(약)', '257' : 'Cross2_휘점(강)', '65793' : 'Cross2_휘점(약)',
-                   '258' : 'Cross2_쿠닉(강)', '65794' : 'Cross2_쿠닉(약)', '259' : 'Cross2_군집,S/C(강)', '65795' : 'Cross2_군집,S/C(약)',
-                   '1793' : '정반사A_기포(백)(강)', '67329' : '정반사A_기포(백)(약)', '1794' : '정반사A_이물(흑)(강)', '67330' : '정반사A_이물(흑)(약)',
-                   '769' : '미분투과_이물(강)', '66305' : '미분투과_이물(약)', '770' : '미분투과_라미눌림(강)', '66306' : '미분투과_라미눌림(약)',
-                   '772' : '미분투과_S/C(강)', '66308' : '미분투과_S/C(약)', '1537' : '정반사B_기포(백)(강)', '67073' : '정반사B_기포(백)(약)',
-                   '1538' : '정반사B_이물(흑)(강)', '67074' : '정반사B_이물(흑)(약)', '1025' : '정투과_점이물(강)', '66561' : '정투과_점이물(약)',
-                   '1026' : '정투과_선이물(강)', '66562' : '정투과_선이물(약)', '1281' : '투영검사_백점(강)', '66817' : '투영검사_백점(약)',
-                   '1282' : '투영검사_흑점(강)', '66818' : '투영검사_흑점(약)', '69782' : 'Cross1_휘점(약)(주기)', '100059' : '정투과_점이물(약)(주기)',
-                   '108752' : 'Cross1_군집,S/C(약)(주기)', '99752' : '정투과_점이물(약)(주기)', '99772' : '정투과_점이물(약)(주기)', '34216' : '정투과_점이물(강)(주기)',
-                   '34236' : '정투과_점이물(강)(주기)', '5716' : 'Cross1_쿠닉(강)(주기)', '69932' : 'Cross1_휘점(약)(주기)', '84767' : '84767',
-                   '84772' : '84772', '84837' : '84837', '84732' : '84732' }
-
-
+    
 class output():
     """
     데이터를 처리해서 특정 원하는 결과 값을 가져올 때 사용한다. 
@@ -484,7 +445,6 @@ class i_plot():
         fig = Figure(data = [trace], layout = layout)
         iplot(fig)
         
-        
 def read_data(lot, rotate = False, slitting = False):   
     """
     데이터 불러오기(DAS)
@@ -501,8 +461,11 @@ def read_data(lot, rotate = False, slitting = False):
     data : 해당 lot의 코팅 raw-data 
     
     """
+    das = pyodbc.connect(db1)
+    gos = pyodbc.connect(db3)
     
-    data = pd.read_sql_query(qs.find_das(lot), db1)
+    data = pd.read_sql_query(qs.find_das(lot), das)
+
     data = marking_match(data, lot)
     data = data.rename(columns = {'REMARK':'광학계','UNIQUE_LOT_NO':'lot','CAMERA_NO':'카메라 번호','MAX_SIZE':'size(max)',
                                   'MIN_SIZE':'size(min)','V_VLAUE':'value','DEFECT_TYPE_CODE':'불량번호','FAULT_XPOS':'x',
@@ -513,7 +476,7 @@ def read_data(lot, rotate = False, slitting = False):
     data['y'] /= 1000
     data.drop(['size(max)','size(min)'], axis = 1, inplace = True)
     if rotate:
-        after_coating_info = pd.read_sql_query(qs.after_coating(lot), db3)
+        after_coating_info = pd.read_sql_query(qs.after_coating(lot), gos)
         if len(after_coating_info)%2 != 0:            
             width, length = read_lot_info(lot)
             data['x'] = width - data['x']
@@ -521,7 +484,8 @@ def read_data(lot, rotate = False, slitting = False):
             if slitting:
                 data['x'] = width - data['x']
                 data['y'] = length - data['y']
-       
+
+    del das, gos      
 
     return data      
     
@@ -540,9 +504,21 @@ def read_excel(file_path):
     data : 파일의 코팅 raw-data
         
     """
-    '업데이트 예정'
+    try:
+        X = pd.read_csv(file_path, sep = '\t', encoding = 'euc-kr')
+    except:
+        fin = open(file_path, 'r')        
+        data_list = fin.readlines()
+        fin.close()   
+        del data_list[:6]        
+        fout = open(file_path, 'w')
+        fout.writelines(data_list)
+        fout.close() 
+        X = pd.read_csv(file_path, sep = '\t', encoding = 'euc-kr')
     
-  
+    X.columns = ['날짜','LOT이름','Frame','카메라','사용안함','INDEX','불량유형','x','y','size(min)','size(max)','img','사용안함','사용안함','백점','흑점','평균밝기']
+    return X
+    
     
 def read_lot_info(lot, test_width = None):
     """
@@ -558,8 +534,10 @@ def read_lot_info(lot, test_width = None):
     width, length : 폭, 길이(tuple)
     
     """
+    iepcs = pyodbc.connect(db2)
+    
     if lot[9] in ['E', 'C']:  #코팅lot
-        width = pd.read_sql_query(qs.find_width(lot), db2).iloc[0][0][:2]
+        width = pd.read_sql_query(qs.find_width(lot), iepcs).iloc[0][0][:2]
         try:
             width = int(width_list[width])                        
         except:
@@ -567,12 +545,14 @@ def read_lot_info(lot, test_width = None):
                 width = test_width 
             else:
                 raise Exception('TEST 제품입니다. 폭을 입력해주세요')
-        length = int(pd.read_sql_query(qs.find_length(lot), db2).iloc[0][0])
+        length = int(pd.read_sql_query(qs.find_length(lot), iepcs).iloc[0][0])
 
     elif lot[9] == 'D': #슬리팅lot
-        width = float(pd.read_sql_query(qs.find_width(lot), db2).iloc[0].str.extract('[(](\d+.\d*)[)]')[0])
-        length = int(pd.read_sql_query(qs.find_length(lot), db2).iloc[0][0])
-
+        width = float(pd.read_sql_query(qs.find_width(lot), iepcs).iloc[0].str.extract('[(](\d+.\d*)[)]')[0])
+        length = int(pd.read_sql_query(qs.find_length(lot), iepcs).iloc[0][0])
+    
+    del iepcs
+    
     return width, length
 
     
@@ -663,21 +643,23 @@ def marking_match(data, lot):
     
     
     """
+    das = pyodbc.connect(db1)
+    
     X = data.copy()
     X['REMARK'] = X['REMARK'].apply(lambda x: '크로스1' if x == '크로스' else x)
     X['강/약'] = X['DEFECT_TYPE_CODE'].apply(lambda x: '약' if int(x)>60000 else '강')
     
     #불량명 데이터1
-    defect_info1 = pd.read_sql_query(qs.defect_information1(), db1)
+    defect_info1 = pd.read_sql_query(qs.defect_information1(), das)
     defect_info1 = defect_info1.rename(columns = {'WORK_CENTER_ID':'PROD_WC_CD', 'DEFECT_MARK_SYMBOL':'FAULT_MARK','STATION_NAME':'REMARK'})
     
     #마킹 유무 판별
-    marking_info = pd.read_sql_query(qs.marking_information(lot), db1).iloc[:,3:].T
+    marking_info = pd.read_sql_query(qs.marking_information(lot), das).iloc[:,3:].T
     marking_info.reset_index(drop = False, inplace = True)
     marking_info.columns = ['CODE_DATA','ON/OFF']
     
     #불량명 데이터2
-    defect_info2 = pd.read_sql_query(qs.defect_information2(), db1)
+    defect_info2 = pd.read_sql_query(qs.defect_information2(), das)
     matching = {'점이물':'이물(점)','선이물':'이물(선)'} # 서버 내 오 기입된 값 따로 매칭.
     defect_info2['DEFECT_MARK_NAME'] = defect_info2['DEFECT_MARK_NAME'].apply(lambda x: matching[x] if x in matching.keys() else x)
 
@@ -688,5 +670,7 @@ def marking_match(data, lot):
     #최종 데이터
     X = pd.merge(Y, marking_status, how = 'left', on = ['DEFECT_MARK_NAME','REMARK','강/약'])
     X.drop('CODE_DATA', axis = 1, inplace = True)
+    
+    del das
     
     return X

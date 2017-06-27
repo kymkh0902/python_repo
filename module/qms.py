@@ -10,20 +10,8 @@ import pyodbc
 
 """Database 목록"""
 
-db1 = pyodbc.connect(
-    r'DRIVER={Oracle in OraClient11g_home1};'
-    r'DBQ=oc_tqms1;'
-    r'UID=lqms_view;'
-    r'PWD=viewdb7388;'               
-    )
-
-db2 = pyodbc.connect(
-    r'DRIVER={Oracle in OraClient11g_home1};'
-    r'DBQ=oc_tqms1;'
-    r'UID=dqms_view;'
-    r'PWD=viewdb7388;'               
-    )
-
+db1 = 'DRIVER={Oracle in OraClient11g_home1};DBQ=oc_tqms1;UID=lqms_view;PWD=viewdb7388;'               
+db2 = 'DRIVER={Oracle in OraClient11g_home1};DBQ=oc_tqms1;UID=dqms_view;PWD=viewdb7388;'               
 
 
 class lqms():
@@ -44,11 +32,14 @@ class lqms():
         X : 데이터(dataframe)
         
         """
-        
-        X = pd.read_sql_query(qs.lqms_data(prod_wc_cd, prod_cd, start_date, end_date, *items), db1)        
+        lqms = pyodbc.connect(db1)
+        X = pd.read_sql_query(qs.lqms_data(prod_wc_cd, prod_cd, start_date, end_date, *items), lqms)        
         X.columns = ['lot','제품코드','물성','단위','n수','측정값','USL','LSL','판정']
         X['측정값'] = X['측정값'].apply(lambda x : 1 if x in ['OK','NG'] else x)
         X[['측정값','USL','LSL']] = X[['측정값','USL','LSL']].astype(float)
+        
+        del lqms
+        
         return X
         
         
@@ -130,8 +121,11 @@ class dqms():
         X : 고객사, Grade 별 모델 정보(dataframe)
         
         """
-        
-        X = pd.read_sql_query(qs.read_model(customer, grade, model), db2)
+        dqms =  pyodbc.connect(db2)
+        X = pd.read_sql_query(qs.read_model(customer, grade, model), dqms)
         X.columns = ['고객사','grade','part no','상/하','모델명','점착제1','점착제2','모드type','application']
+
+        del dqms
+        
         return X
     
