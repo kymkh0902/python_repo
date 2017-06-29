@@ -1616,7 +1616,7 @@ def after_coating(lot):
 def yt_inspection(start_date, end_date):
     return(
     '''
-    SELECT X.global_create_no, Z.unique_lot_no 재단, 검사, 투입수, 불량수, 불량명, 코드, 제품명, 생산호기, z.remark FROM
+    SELECT F_FIND_CC_LOT(X.global_create_no) 코팅, Z.unique_lot_no 재단, 검사, 투입수, 불량수, 불량명, 코드, 제품명, 생산호기, z.remark FROM
 
         (SELECT 
               global_create_no, normal_qty 투입수, disproduct_qty 불량수, unique_lot_no 검사, d.prod_cd 코드, d.prod_nm 제품명, c.disp_factor_cd 불량명, prod_wc_cd 생산호기

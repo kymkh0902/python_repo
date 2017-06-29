@@ -483,9 +483,7 @@ def read_data(lot, rotate = False, slitting = False):
             data['y'] = length - data['y']
             if slitting:
                 data['x'] = width - data['x']
-                data['y'] = length - data['y']
-
-    del das, gos      
+                data['y'] = length - data['y']     
 
     return data      
     
@@ -550,9 +548,7 @@ def read_lot_info(lot, test_width = None):
     elif lot[9] == 'D': #슬리팅lot
         width = float(pd.read_sql_query(qs.find_width(lot), iepcs).iloc[0].str.extract('[(](\d+.\d*)[)]')[0])
         length = int(pd.read_sql_query(qs.find_length(lot), iepcs).iloc[0][0])
-    
-    del iepcs
-    
+        
     return width, length
 
     
@@ -664,13 +660,11 @@ def marking_match(data, lot):
     defect_info2['DEFECT_MARK_NAME'] = defect_info2['DEFECT_MARK_NAME'].apply(lambda x: matching[x] if x in matching.keys() else x)
 
     #불량명에 따른 마킹 유무 취합
-    marking_status = pd.merge(defect_info2, marking_info, how = 'left', on = 'CODE_DATA') # 합칠 수 있을 거 같은데 JOIN문 알면   
+    marking_status = pd.merge(defect_info2, marking_info, how = 'left', on = 'CODE_DATA') 
     Y = pd.merge(X, defect_info1, how = 'left', on = ['PROD_WC_CD','FAULT_MARK','REMARK'])
     
     #최종 데이터
     X = pd.merge(Y, marking_status, how = 'left', on = ['DEFECT_MARK_NAME','REMARK','강/약'])
     X.drop('CODE_DATA', axis = 1, inplace = True)
-    
-    del das
     
     return X

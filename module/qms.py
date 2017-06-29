@@ -37,9 +37,7 @@ class lqms():
         X.columns = ['lot','제품코드','물성','단위','n수','측정값','USL','LSL','판정']
         X['측정값'] = X['측정값'].apply(lambda x : 1 if x in ['OK','NG'] else x)
         X[['측정값','USL','LSL']] = X[['측정값','USL','LSL']].astype(float)
-        
-        del lqms
-        
+               
         return X
         
         
@@ -124,8 +122,6 @@ class dqms():
         dqms =  pyodbc.connect(db2)
         X = pd.read_sql_query(qs.read_model(customer, grade, model), dqms)
         X.columns = ['고객사','grade','part no','상/하','모델명','점착제1','점착제2','모드type','application']
-
-        del dqms
-        
+     
         return X
     
